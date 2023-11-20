@@ -1,0 +1,17 @@
+digraph {
+  rankdir = HR;
+  node [shape = Mrecord, color = "#660066", style = filled, fillcolor = "#DFBFFF"];
+  node_000001ff0f0814a0[label = " / ", color = "#000066", style = filled, fillcolor = "#D5EAFF"]; 
+  node_000001ff0f081420[label = " - ", color = "#000066", style = filled, fillcolor = "#D5EAFF"]; 
+  node_000001ff0f0813e0[label = " 300 "]; 
+  node_000001ff0f081400[label = " 100 "]; 
+  node_000001ff0f081480[label = " - ", color = "#000066", style = filled, fillcolor = "#D5EAFF"]; 
+  node_000001ff0f081440[label = " 30 "]; 
+  node_000001ff0f081460[label = " 10 "]; 
+  node_000001ff0f0814a0 -> node_000001ff0f081420 [weight = 1];
+  node_000001ff0f081420 -> node_000001ff0f0813e0 [weight = 1];
+  node_000001ff0f081420 -> node_000001ff0f081400 [weight = 1];
+  node_000001ff0f0814a0 -> node_000001ff0f081480 [weight = 1];
+  node_000001ff0f081480 -> node_000001ff0f081440 [weight = 1];
+  node_000001ff0f081480 -> node_000001ff0f081460 [weight = 1];
+}

@@ -21,6 +21,7 @@ int main() {
 
     FILE* output = fopen("TreeDump.txt", "w");
     print_node_in(tree1->root, output);
+    graph_dump(tree1);
 
     fclose(output);
     tree_dtor(tree1);
