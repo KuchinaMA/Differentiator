@@ -3,6 +3,7 @@
 
 const int DATA_POISON = -555;
 const int TYPE_POISON = 0;
+const size_t MAX_LINE_LEN = 100;
 
 enum Types {
     T_NUM  = 1,
@@ -32,7 +33,12 @@ struct Tree {
 
 Node* node_ctor(int type, int data, Node* left, Node* right);
 int node_dtor(Node* node);
+
 Tree* tree_ctor(Node* root, size_t size);
 int tree_dtor(Tree* tree);
+
+Tree* read_data(FILE* file);
+Node* read_node(FILE* file);
+int count_nodes(FILE* file);
 
 #endif // TREE_H_INCLUDED

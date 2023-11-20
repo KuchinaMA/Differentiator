@@ -5,7 +5,7 @@
 
 int main() {
 
-    Node* node300 = node_ctor(T_NUM, 300, 0, 0);
+    /*Node* node300 = node_ctor(T_NUM, 300, 0, 0);
     Node* node100 = node_ctor(T_NUM, 100, 0, 0);
 
     Node* node_sub1 = node_ctor(T_OPER, SUB, node300, node100);
@@ -24,7 +24,17 @@ int main() {
     graph_dump(tree1);
 
     fclose(output);
-    tree_dtor(tree1);
+    tree_dtor(tree1);*/
+
+    FILE* input = fopen("TestData1.txt", "r");
+    Tree* tree2 = read_data(input);
+
+    FILE* output2 = fopen("TreeDump2.txt", "w");
+    print_node_in(tree2->root, output2);
+    graph_dump(tree2);
+
+    fclose(output2);
+    tree_dtor(tree2);
 
     return 0;
 }
