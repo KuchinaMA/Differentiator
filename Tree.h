@@ -41,4 +41,6 @@ Tree* read_data(FILE* file);
 Node* read_node(FILE* file);
 int count_nodes(FILE* file);
 
+int tree_calculate(Node* node);
+
 #endif // TREE_H_INCLUDED

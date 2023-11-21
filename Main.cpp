@@ -26,15 +26,19 @@ int main() {
     fclose(output);
     tree_dtor(tree1);*/
 
-    FILE* input = fopen("TestData1.txt", "r");
+    FILE* input = fopen("TestData2.txt", "r");
     Tree* tree2 = read_data(input);
 
     FILE* output2 = fopen("TreeDump2.txt", "w");
     print_node_in(tree2->root, output2);
     graph_dump(tree2);
 
+    int res = tree_calculate(tree2->root);
+    printf("%d", res);
+
     fclose(output2);
     tree_dtor(tree2);
+
 
     return 0;
 }

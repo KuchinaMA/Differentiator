@@ -151,6 +151,29 @@ int count_nodes(FILE* file) {
     return nodes_num;
 }
 
+int tree_calculate(Node* node) {
+
+    assert(node);
+
+    if (node->type == T_NUM)
+        return node->data;
+    else if (node->type == T_OPER) {
+        int left = tree_calculate(node->left);
+        int right = tree_calculate(node->right);
+        switch (node->data) {
+            case ADD:
+                return left + right;
+            case SUB:
+                return left - right;
+            case MUL:
+                return left * right;
+            case DIV:
+                return left / right;
+        }
+    }
+
+}
+
 
 
 
