@@ -17,21 +17,6 @@ void print_node_pre(const Node* node, FILE* output) {
     fprintf(output, " )");
 }
 
-void print_node_in(const Node* node, FILE* output) {
-
-    if (node == 0) {
-        fprintf(output, " .");
-        return;
-    }
-    if (node->type != T_NUM)
-        fprintf(output, " (");
-    print_node_in(node->left, output);
-    print_data(node, output);
-    print_node_in(node->right, output);
-    if (node->type != T_NUM)
-        fprintf(output, " )");
-}
-
 void print_data(const Node* node, FILE* output) {
 
     switch (node->type) {
@@ -42,6 +27,40 @@ void print_data(const Node* node, FILE* output) {
             fprintf(output, " %c", operation_to_sign(node));
             break;
     }
+}
+
+
+void print_node_in(const Node* node, FILE* output, int parent_data) {
+
+    if (node == 0) {
+        //fprintf(output, " .");
+        return;
+    }
+    if (node->type == T_NUM)
+        print_num(node, output);
+    else if (node->type == T_OPER)
+        print_oper(node, output, parent_data);
+}
+
+void print_num(const Node* node, FILE* output) {
+
+    print_node_in(node->left, output, node->data);
+    fprintf(output, " %d", node->data);
+    print_node_in(node->right, output, node->data);
+}
+
+void print_oper(const Node* node, FILE* output, int parent_data) {
+
+    int cur_oper = operation_priority(parent_data);
+    int next_oper = operation_priority(node->data);
+    if (next_oper <= cur_oper)
+        fprintf(output, " (");
+    print_node_in(node->left, output, node->data);
+    //print_data(node, output);
+    fprintf(output, " %c", operation_to_sign(node));
+    print_node_in(node->right, output, node->data);
+    if (next_oper <= cur_oper)
+        fprintf(output, " )");
 }
 
 char operation_to_sign(const Node* node) {
@@ -60,6 +79,18 @@ char operation_to_sign(const Node* node) {
             break;
     }
 }
+
+int operation_priority(int oper) {
+
+    if (oper == BEGIN_OP)
+        return -1;
+    else if (oper == MUL || oper == DIV)
+        return 1;
+    else if (oper == ADD || oper == SUB)
+        return 0;
+}
+
+//int compare_operations(parent_op
 
 int graph_dump(const Tree* tree) {
 

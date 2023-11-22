@@ -30,7 +30,7 @@ int main() {
     Tree* tree2 = read_data(input);
 
     FILE* output2 = fopen("TreeDump2.txt", "w");
-    print_node_in(tree2->root, output2);
+    print_node_in(tree2->root, output2, BEGIN_OP);
     graph_dump(tree2);
 
     int res = tree_calculate(tree2->root);
