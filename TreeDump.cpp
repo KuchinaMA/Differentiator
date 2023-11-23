@@ -30,10 +30,10 @@ void print_data(const Node* node, FILE* output) {
 }
 
 void print_tree_in(Tree* tree, FILE* output) {
-    print_node_in(tree->root, output, BEGIN_OP);
+    print_node_in(tree->root, output, BEGIN_OP, MID);
 }
 
-void print_node_in(const Node* node, FILE* output, int parent_data) {
+void print_node_in(const Node* node, FILE* output, int parent_data, int position) {
 
     if (node == 0) {
         //fprintf(output, " .");
@@ -42,24 +42,24 @@ void print_node_in(const Node* node, FILE* output, int parent_data) {
     if (node->type == T_NUM)
         print_num(node, output);
     else if (node->type == T_OPER)
-        print_oper(node, output, parent_data);
+        print_oper(node, output, parent_data, position);
 }
 
 void print_num(const Node* node, FILE* output) {
 
-    print_node_in(node->left, output, node->data);
+    print_node_in(node->left, output, node->data, LEFT);
     fprintf(output, " %d", node->data);
-    print_node_in(node->right, output, node->data);
+    print_node_in(node->right, output, node->data, RIGHT);
 }
 
-void print_oper(const Node* node, FILE* output, int parent_data) {
+void print_oper(const Node* node, FILE* output, int parent_data, int position) {
 
-    int bracket = compare_operations(parent_data, node->data);
+    int bracket = compare_operations(parent_data, node->data, position);
     if (bracket)
         fprintf(output, " (");
-    print_node_in(node->left, output, node->data);
+    print_node_in(node->left, output, node->data, LEFT);
     fprintf(output, " %c", operation_to_sign(node));
-    print_node_in(node->right, output, node->data);
+    print_node_in(node->right, output, node->data, RIGHT);
     if (bracket)
         fprintf(output, " )");
 }
@@ -81,28 +81,36 @@ char operation_to_sign(const Node* node) {
     }
 }
 
-/*int operation_priority(int oper) {
 
-    if (oper == BEGIN_OP)
-        return -1;
-    else if (oper == MUL || oper == DIV)
-        return 1;
-    else if (oper == ADD || oper == SUB)
-        return 0;
-} */
-
-int compare_operations(int parent_op, int cur_op) {
+int compare_operations(int parent_op, int cur_op, int position) {
 
     if (parent_op == ADD)
         return 0;
+
     else if (parent_op == SUB) {
-        return 0;
+        if (cur_op == ADD || cur_op == SUB) {
+            if (position == RIGHT)
+                return 1;
+        }
+        else
+            return 0;
     }
+
     else if (parent_op == MUL)
-        return 1;
+        if (cur_op == MUL || cur_op == DIV)
+            return 0;
+
+        else
+            return 1;
 
     else if (parent_op == DIV)
-        return 1;
+        if (cur_op == MUL || cur_op == DIV) {
+            if (position == LEFT)
+                return 0;
+        }
+        else
+            return 1;
+
     else if (parent_op == BEGIN_OP)
         return 0;
 }
