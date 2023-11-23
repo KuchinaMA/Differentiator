@@ -23,4 +23,9 @@ int graph_dump(const Tree* tree);
 void node_graph_dump(Node* node, FILE* dotfile);
 void edge_graph_dump(Node* node, FILE* dotfile);
 
+void print_tree_tex(Tree* tree, FILE* output);
+void print_node_tex(const Node* node, FILE* output, int parent_data, int position);
+void print_oper_tex(const Node* node, FILE* output, int parent_data, int position);
+int compare_operations_tex(int parent_op, int cur_op, int position);
+
 #endif // TREEDUMP_H_INCLUDED

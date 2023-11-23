@@ -7,7 +7,7 @@ const size_t MAX_LINE_LEN = 100;
 
 enum Types {
     T_NUM  = 1,
-    T_OPER = 2,
+    T_OP   = 2,
     T_VAR  = 3,
 };
 

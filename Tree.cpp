@@ -87,7 +87,7 @@ Node* read_node(FILE* file) {
             node->data = MUL;
         else if (strcmp(current, "div") == 0)
             node->data = DIV;
-        node->type = T_OPER;
+        node->type = T_OP;
     }
 
     fscanf(file, "%s", current);
@@ -157,7 +157,7 @@ int tree_calculate(Node* node) {
 
     if (node->type == T_NUM)
         return node->data;
-    else if (node->type == T_OPER) {
+    else if (node->type == T_OP) {
         int left = tree_calculate(node->left);
         int right = tree_calculate(node->right);
         switch (node->data) {

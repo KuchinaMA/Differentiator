@@ -31,12 +31,17 @@ int main() {
 
     FILE* output2 = fopen("TreeDump2.txt", "w");
     print_tree_in(tree2, output2);
+
+    FILE* tex = fopen("TreeDumpTex2.txt", "w");
+    print_tree_tex(tree2, tex);
+
     graph_dump(tree2);
 
-    int res = tree_calculate(tree2->root);
-    printf("%d", res);
+    //int res = tree_calculate(tree2->root);
+    //printf("%d", res);
 
     fclose(output2);
+    fclose(tex);
     tree_dtor(tree2);
 
 

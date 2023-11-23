@@ -23,7 +23,7 @@ void print_data(const Node* node, FILE* output) {
         case T_NUM:
             fprintf(output, " %d", node->data);
             break;
-        case T_OPER:
+        case T_OP:
             fprintf(output, " %c", operation_to_sign(node));
             break;
     }
@@ -35,13 +35,12 @@ void print_tree_in(Tree* tree, FILE* output) {
 
 void print_node_in(const Node* node, FILE* output, int parent_data, int position) {
 
-    if (node == 0) {
-        //fprintf(output, " .");
+    if (node == 0)
         return;
-    }
+
     if (node->type == T_NUM)
         print_num(node, output);
-    else if (node->type == T_OPER)
+    else if (node->type == T_OP)
         print_oper(node, output, parent_data, position);
 }
 
@@ -96,20 +95,22 @@ int compare_operations(int parent_op, int cur_op, int position) {
             return 0;
     }
 
-    else if (parent_op == MUL)
+    else if (parent_op == MUL) {
         if (cur_op == MUL || cur_op == DIV)
             return 0;
 
         else
             return 1;
+    }
 
-    else if (parent_op == DIV)
+    else if (parent_op == DIV) {
         if (cur_op == MUL || cur_op == DIV) {
             if (position == LEFT)
                 return 0;
         }
         else
             return 1;
+    }
 
     else if (parent_op == BEGIN_OP)
         return 0;
@@ -143,7 +144,7 @@ void node_graph_dump(Node* node, FILE* dotfile) {
         return;
     if (node->type == T_NUM)
         fprintf(dotfile, "  node_%p[label = \" %d \"]; \n", node, node->data);
-    else if (node->type == T_OPER)
+    else if (node->type == T_OP)
         fprintf(dotfile, "  node_%p[label = \" %c \", color = \"#000066\", style = filled, fillcolor = \"#D5EAFF\"]; \n", node, operation_to_sign(node));
     node_graph_dump(node->left, dotfile);
     node_graph_dump(node->right, dotfile);
@@ -162,6 +163,82 @@ void edge_graph_dump(Node* node, FILE* dotfile) {
         fprintf(dotfile, "  node_%p -> node_%p [weight = 1];\n", node, node->right);
         edge_graph_dump(node->right, dotfile);
     }
+}
+
+void print_tree_tex(Tree* tree, FILE* output) {
+    fprintf(output, "\\[");
+    print_node_tex(tree->root, output, BEGIN_OP, MID);
+    fprintf(output, "\\]");
+}
+
+
+void print_node_tex(const Node* node, FILE* output, int parent_data, int position) {
+
+    if (node == 0)
+        return;
+
+    if (node->type == T_NUM)
+        print_num(node, output);
+    else if (node->type == T_OP)
+        print_oper_tex(node, output, parent_data, position);
+}
+
+void print_oper_tex(const Node* node, FILE* output, int parent_data, int position) {
+
+    if (node->data == DIV) {
+        fprintf(output, " \\frac{");
+        print_node_tex(node->left, output, node->data, LEFT);
+        fprintf(output, "}{");
+        print_node_tex(node->right, output, node->data, RIGHT);
+        fprintf(output, "}");
+    }
+
+    else {
+        int bracket = compare_operations_tex(parent_data, node->data, position);
+        if (bracket)
+            fprintf(output, " (");
+
+        print_node_tex(node->left, output, node->data, LEFT);
+
+        if (node->data == ADD || node->data == SUB)
+            fprintf(output, " %c", operation_to_sign(node));
+        else
+            fprintf(output, " \\cdot");
+
+        print_node_tex(node->right, output, node->data, RIGHT);
+
+        if (bracket)
+            fprintf(output, " )");
+    }
+}
+
+int compare_operations_tex(int parent_op, int cur_op, int position) {
+
+    if (parent_op == ADD)
+        return 0;
+
+    else if (parent_op == SUB) {
+        if (cur_op == ADD || cur_op == SUB) {
+            if (position == RIGHT)
+                return 1;
+        }
+        else
+            return 0;
+    }
+
+    else if (parent_op == MUL) {
+        if (cur_op == MUL || cur_op == DIV)
+            return 0;
+
+        else
+            return 1;
+    }
+
+    else if (parent_op == DIV)
+        return 0;
+
+    else if (parent_op == BEGIN_OP)
+        return 0;
 }
 
 
