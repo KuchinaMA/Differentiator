@@ -29,6 +29,9 @@ void print_data(const Node* node, FILE* output) {
     }
 }
 
+void print_tree_in(Tree* tree, FILE* output) {
+    print_node_in(tree->root, output, BEGIN_OP);
+}
 
 void print_node_in(const Node* node, FILE* output, int parent_data) {
 
@@ -51,15 +54,13 @@ void print_num(const Node* node, FILE* output) {
 
 void print_oper(const Node* node, FILE* output, int parent_data) {
 
-    int cur_oper = operation_priority(parent_data);
-    int next_oper = operation_priority(node->data);
-    if (next_oper <= cur_oper)
+    int bracket = compare_operations(parent_data, node->data);
+    if (bracket)
         fprintf(output, " (");
     print_node_in(node->left, output, node->data);
-    //print_data(node, output);
     fprintf(output, " %c", operation_to_sign(node));
     print_node_in(node->right, output, node->data);
-    if (next_oper <= cur_oper)
+    if (bracket)
         fprintf(output, " )");
 }
 
@@ -80,7 +81,7 @@ char operation_to_sign(const Node* node) {
     }
 }
 
-int operation_priority(int oper) {
+/*int operation_priority(int oper) {
 
     if (oper == BEGIN_OP)
         return -1;
@@ -88,9 +89,24 @@ int operation_priority(int oper) {
         return 1;
     else if (oper == ADD || oper == SUB)
         return 0;
+} */
+
+int compare_operations(int parent_op, int cur_op) {
+
+    if (parent_op == ADD)
+        return 0;
+    else if (parent_op == SUB) {
+        return 0;
+    }
+    else if (parent_op == MUL)
+        return 1;
+
+    else if (parent_op == DIV)
+        return 1;
+    else if (parent_op == BEGIN_OP)
+        return 0;
 }
 
-//int compare_operations(parent_op
 
 int graph_dump(const Tree* tree) {
 
