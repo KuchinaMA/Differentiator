@@ -1,1 +1,1 @@
- ( mul ( div ( 300 nil nil ) ( 100 nil nil ) ) ( add ( 30 nil nil ) ( 20 nil nil ) ) )
+ ( div ( sub ( 300 nil nil ) ( 100 nil nil ) ) ( add ( 30 nil nil ) ( 20 nil nil ) ) )

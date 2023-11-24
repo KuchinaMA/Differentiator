@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 #include <strings.h>
 
 #include "Tree.h"
@@ -62,7 +62,7 @@ int tree_dtor(Tree* tree) {
 
 
 
-Node* read_node(FILE* file) {
+/*Node* read_node(FILE* file) {
 
     char current[MAX_LINE_LEN] = "";
 
@@ -133,7 +133,7 @@ Tree* read_data(FILE* file) {
     Tree* new_tree = tree_ctor(new_node, size);
 
     return new_tree;
-}
+} */
 
 int count_nodes(FILE* file) {
 
@@ -172,6 +172,139 @@ int tree_calculate(Node* node) {
         }
     }
 
+}
+
+
+MathExpression* expression_ctor(Tree* tree) {
+
+    MathExpression* expression = (MathExpression*)calloc(1, sizeof(MathExpression));
+    expression->tree = tree;
+    //expression->variables = (Variable*)calloc(MAX_VARS_NUM, sizeof(Variable));
+    for (int i = 0; i < MAX_VARS_NUM; i++) {
+        expression->variables[i].name = "";
+        expression->variables[i].value = DEFAULT_VAR_VALUE;
+    }
+
+    expression->vars_num = 0;
+
+    return expression;
+}
+
+int expression_dtor(MathExpression* expression) {
+
+    tree_dtor(expression->tree);
+    //free(expression->variables);
+    for (int i = 0; i < MAX_VARS_NUM; i++) {
+        expression->variables[i].name = "";
+        expression->variables[i].value = DEFAULT_VAR_VALUE;
+    }
+    expression->vars_num = 0;
+
+    free(expression);
+
+    return 0;
+}
+
+
+
+
+Node* read_node(FILE* file, MathExpression* exp) {
+
+    char current[MAX_LINE_LEN] = "";
+
+    Node* node = (Node*)calloc(1, sizeof(Node));
+    assert(node && "It's impossible to create new node");
+
+    int number = 0;
+    int scan_res = fscanf(file, "%d", &number);
+
+    if (scan_res == 1) {
+        node->data = number;
+        node->type = T_NUM;
+    }
+
+    else {
+        fscanf(file, "%s", current);
+        if (strcmp(current, "add") == 0) {
+            node->data = ADD;
+            node->type = T_OP;
+        }
+        else if (strcmp(current, "sub") == 0) {
+            node->data = SUB;
+            node->type = T_OP;
+        }
+        else if (strcmp(current, "mul") == 0) {
+            node->data = MUL;
+            node->type = T_OP;
+        }
+        else if (strcmp(current, "div") == 0) {
+            node->data = DIV;
+            node->type = T_OP;
+        }
+        else {
+            //printf("%s\n", current);
+            //printf("a %d\n", exp->vars_num);
+            exp->variables[exp->vars_num].name = strdup(current);
+            //printf("%s\n", exp->variables[exp->vars_num].name);
+            exp->variables[exp->vars_num].value = DEFAULT_VAR_VALUE;
+            //printf("%d\n", exp->variables[exp->vars_num].value);
+            exp->vars_num ++;
+            //printf("m %d\n", exp->vars_num);
+            node->data = exp->variables[exp->vars_num].value;
+            node->type = T_VAR;
+        }
+
+    }
+
+    fscanf(file, "%s", current);
+
+    if (strcmp("(", current) == 0)
+        node->left = read_node(file, exp);
+
+    else if (strcmp("nil", current) == 0)
+        node->left = 0;
+
+    else
+        printf("Syntax error!\n");
+
+
+    fscanf(file, "%s", current);
+    if (strcmp("(", current) == 0)
+        node->right = read_node(file, exp);
+
+    else if (strcmp("nil", current) == 0)
+        node->right = 0;
+
+    else {
+        printf("Syntax error!\n");
+        printf("current %s\n", current);
+    }
+
+
+    fscanf(file, "%s", current); //закрывающая скобка
+
+    return node;
+}
+
+
+MathExpression* read_data(FILE* file) {
+
+    MathExpression* new_exp = (MathExpression*)calloc(1, sizeof(MathExpression));
+
+    int size = count_nodes(file);
+
+    char current[MAX_LINE_LEN] = "";
+
+    fscanf(file, "%s", current);          //открывающая скобка
+
+    Node* new_node = read_node(file, new_exp);
+    Tree* new_tree = tree_ctor(new_node, size);
+
+    new_exp->tree = new_tree;
+
+    //printf("%lld\n", new_exp->vars_num);
+
+    return new_exp;
 }
 
 

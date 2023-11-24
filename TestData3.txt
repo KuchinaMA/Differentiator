@@ -1,0 +1,1 @@
+ ( div ( sub ( y nil nil ) ( 100 nil nil ) ) ( add ( x nil nil ) ( aboba nil nil ) ) )
