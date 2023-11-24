@@ -29,39 +29,50 @@ void print_data(const Node* node, FILE* output) {
     }
 }
 
-void print_tree_in(Tree* tree, FILE* output) {
-    print_node_in(tree->root, output, BEGIN_OP, MID);
+void print_tree_in(const MathExpression* expression, FILE* output) {
+    print_node_in(expression, expression->tree->root, output, BEGIN_OP, MID);
 }
 
-void print_node_in(const Node* node, FILE* output, int parent_data, int position) {
+void print_node_in(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position) {
 
     if (node == 0)
         return;
 
     if (node->type == T_NUM)
-        print_num(node, output);
+        print_num(expression, node, output);
     else if (node->type == T_OP)
-        print_oper(node, output, parent_data, position);
+        print_oper(expression, node, output, parent_data, position);
+
+    else if (node->type == T_VAR)
+        print_var(expression, node, output);
 }
 
-void print_num(const Node* node, FILE* output) {
+void print_num(const MathExpression* expression, const Node* node, FILE* output) {
 
-    print_node_in(node->left, output, node->data, LEFT);
+    print_node_in(expression, node->left, output, node->data, LEFT);
     fprintf(output, " %d", node->data);
-    print_node_in(node->right, output, node->data, RIGHT);
+    print_node_in(expression, node->right, output, node->data, RIGHT);
 }
 
-void print_oper(const Node* node, FILE* output, int parent_data, int position) {
+void print_oper(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position) {
 
     int bracket = compare_operations(parent_data, node->data, position);
     if (bracket)
         fprintf(output, " (");
-    print_node_in(node->left, output, node->data, LEFT);
+    print_node_in(expression, node->left, output, node->data, LEFT);
     fprintf(output, " %c", operation_to_sign(node));
-    print_node_in(node->right, output, node->data, RIGHT);
+    print_node_in(expression, node->right, output, node->data, RIGHT);
     if (bracket)
         fprintf(output, " )");
 }
+
+void print_var(const MathExpression* expression, const Node* node, FILE* output) {
+
+    print_node_in(expression, node->left, output, node->data, LEFT);
+    fprintf(output, " %s", expression->variables[node->data].name);
+    print_node_in(expression, node->right, output, node->data, RIGHT);
+}
+
 
 char operation_to_sign(const Node* node) {
     switch (node->data) {
@@ -117,28 +128,28 @@ int compare_operations(int parent_op, int cur_op, int position) {
 }
 
 
-int graph_dump(const Tree* tree) {
+int graph_dump(const MathExpression* expression) {
 
-    FILE* dotfile = fopen("TreePicture.dot", "w");
+    FILE* dotfile = fopen("TreePicture3.dot", "w");
 
     fprintf(dotfile, "digraph {\n");
     fprintf(dotfile, "  rankdir = HR;\n");
     fprintf(dotfile, "  node [shape = Mrecord, color = \"#660066\", style = filled, fillcolor = \"#DFBFFF\"];\n");
 
-    node_graph_dump(tree->root, dotfile);
-    edge_graph_dump(tree->root, dotfile);
+    node_graph_dump(expression, expression->tree->root, dotfile);
+    edge_graph_dump(expression->tree->root, dotfile);
 
     fprintf(dotfile, "}");
 
     fclose(dotfile);
 
-    system("dot TreePicture.dot -T png -o TreePicture.png");
+    system("dot TreePicture3.dot -T png -o TreePicture3.png");
 
     return 0;
 }
 
 
-void node_graph_dump(Node* node, FILE* dotfile) {
+void node_graph_dump(const MathExpression* expression, const Node* node, FILE* dotfile) {
 
     if (node == 0)
         return;
@@ -146,13 +157,15 @@ void node_graph_dump(Node* node, FILE* dotfile) {
         fprintf(dotfile, "  node_%p[label = \" %d \"]; \n", node, node->data);
     else if (node->type == T_OP)
         fprintf(dotfile, "  node_%p[label = \" %c \", color = \"#000066\", style = filled, fillcolor = \"#D5EAFF\"]; \n", node, operation_to_sign(node));
-    node_graph_dump(node->left, dotfile);
-    node_graph_dump(node->right, dotfile);
+    else if (node->type == T_VAR)
+        fprintf(dotfile, "  node_%p[label = \" %s \", color = \"#660033\", style = filled, fillcolor = \"#FFD5EA\"]; \n", node, expression->variables[node->data].name);
+    node_graph_dump(expression, node->left, dotfile);
+    node_graph_dump(expression, node->right, dotfile);
 
 }
 
 
-void edge_graph_dump(Node* node, FILE* dotfile) {
+void edge_graph_dump(const Node* node, FILE* dotfile) {
 
     if (node->left != 0) {
         fprintf(dotfile, "  node_%p -> node_%p [weight = 1];\n", node, node->left);
@@ -165,31 +178,33 @@ void edge_graph_dump(Node* node, FILE* dotfile) {
     }
 }
 
-void print_tree_tex(Tree* tree, FILE* output) {
+void print_tree_tex(const MathExpression* expression, FILE* output) {
     fprintf(output, "\\[");
-    print_node_tex(tree->root, output, BEGIN_OP, MID);
+    print_node_tex(expression, expression->tree->root, output, BEGIN_OP, MID);
     fprintf(output, "\\]");
 }
 
 
-void print_node_tex(const Node* node, FILE* output, int parent_data, int position) {
+void print_node_tex(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position) {
 
     if (node == 0)
         return;
 
     if (node->type == T_NUM)
-        print_num(node, output);
+        print_num(expression, node, output);
     else if (node->type == T_OP)
-        print_oper_tex(node, output, parent_data, position);
+        print_oper_tex(expression, node, output, parent_data, position);
+    else if (node->type == T_VAR)
+        print_var(expression, node, output);
 }
 
-void print_oper_tex(const Node* node, FILE* output, int parent_data, int position) {
+void print_oper_tex(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position) {
 
     if (node->data == DIV) {
         fprintf(output, " \\frac{");
-        print_node_tex(node->left, output, node->data, LEFT);
+        print_node_tex(expression, node->left, output, node->data, LEFT);
         fprintf(output, "}{");
-        print_node_tex(node->right, output, node->data, RIGHT);
+        print_node_tex(expression, node->right, output, node->data, RIGHT);
         fprintf(output, "}");
     }
 
@@ -198,14 +213,14 @@ void print_oper_tex(const Node* node, FILE* output, int parent_data, int positio
         if (bracket)
             fprintf(output, " (");
 
-        print_node_tex(node->left, output, node->data, LEFT);
+        print_node_tex(expression, node->left, output, node->data, LEFT);
 
         if (node->data == ADD || node->data == SUB)
             fprintf(output, " %c", operation_to_sign(node));
         else
             fprintf(output, " \\cdot");
 
-        print_node_tex(node->right, output, node->data, RIGHT);
+        print_node_tex(expression, node->right, output, node->data, RIGHT);
 
         if (bracket)
             fprintf(output, " )");

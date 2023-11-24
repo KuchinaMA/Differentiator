@@ -43,12 +43,12 @@ int main() {
 
 
     FILE* output3 = fopen("TreeDump3.txt", "w");
-    //print_tree_in(tree2, output2);
+    print_tree_in(exp, output3);
 
     FILE* tex = fopen("TreeDumpTex3.txt", "w");
-    //print_tree_tex(tree2, tex);
+    print_tree_tex(exp, tex);
 
-    //graph_dump(tree2);
+    graph_dump(exp);
 
     //int res = tree_calculate(tree2->root);
     //printf("%d", res);

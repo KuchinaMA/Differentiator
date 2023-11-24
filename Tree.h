@@ -51,7 +51,6 @@ Tree* tree_ctor(Node* root, size_t size);
 int tree_dtor(Tree* tree);
 
 MathExpression* read_data(FILE* file);
-//Tree* read_data(FILE* file);
 Node* read_node(FILE* file, MathExpression* exp);
 int count_nodes(FILE* file);
 
