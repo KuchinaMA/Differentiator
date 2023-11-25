@@ -96,6 +96,18 @@ int tree_calculate(Node* node) {
                 return left * right;
             case DIV:
                 return left / right;
+            case LN:
+                return log(right);
+            case POW:
+                return pow(left, right);
+            case SIN:
+                return sin(right);
+            case COS:
+                return cos(right);
+            case TAN:
+                return tan(right);
+            case CTG:
+                return 1 / tan(right);
         }
     }
 
@@ -152,39 +164,8 @@ Node* read_node(FILE* file, MathExpression* exp) {
         node->type = T_NUM;
     }
 
-    else {
-        fscanf(file, "%s", current);
-        if (strcmp(current, "add") == 0) {
-            node->data = ADD;
-            node->type = T_OP;
-        }
-        else if (strcmp(current, "sub") == 0) {
-            node->data = SUB;
-            node->type = T_OP;
-        }
-        else if (strcmp(current, "mul") == 0) {
-            node->data = MUL;
-            node->type = T_OP;
-        }
-        else if (strcmp(current, "div") == 0) {
-            node->data = DIV;
-            node->type = T_OP;
-        }
-        else {
-            //printf("%s\n", current);
-            //printf("a %d\n", exp->vars_num);
-            exp->variables[exp->vars_num].name = strdup(current);
-            //printf("%s\n", exp->variables[exp->vars_num].name);
-            exp->variables[exp->vars_num].value = DEFAULT_VAR_VALUE;
-            node->data = exp->vars_num;
-            //printf("%d\n", exp->variables[exp->vars_num].value);
-            exp->vars_num ++;
-            //printf("m %d\n", exp->vars_num);
-            //node->data = exp->variables[exp->vars_num].value;
-            node->type = T_VAR;
-        }
-
-    }
+    else
+        read_operation(file, exp, node);
 
     fscanf(file, "%s", current);
 
@@ -214,6 +195,73 @@ Node* read_node(FILE* file, MathExpression* exp) {
     fscanf(file, "%s", current); //çàêğûâàşùàÿ ñêîáêà
 
     return node;
+}
+
+
+void read_operation(FILE* file, MathExpression* exp, Node* node) {
+
+    assert(exp);
+    assert(node);
+
+    char current[MAX_LINE_LEN] = "";
+    fscanf(file, "%s", current);
+    if (strcmp(current, "add") == 0) {
+        node->data = ADD;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "sub") == 0) {
+        node->data = SUB;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "mul") == 0) {
+        node->data = MUL;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "div") == 0) {
+        node->data = DIV;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "ln") == 0) {
+        node->data = LN;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "pow") == 0) {
+        node->data = POW;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "sin") == 0) {
+        node->data = SIN;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "cos") == 0) {
+        node->data = COS;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "tan") == 0) {
+        node->data = TAN;
+        node->type = T_OP;
+    }
+    else if (strcmp(current, "ctg") == 0) {
+        node->data = CTG;
+        node->type = T_OP;
+    }
+    else
+        read_variable(file, exp, node, current);
+}
+
+
+void read_variable(FILE* file, MathExpression* exp, Node* node, char* current) {
+
+    assert(exp);
+    assert(node);
+
+    exp->variables[exp->vars_num].name = strdup(current);
+    exp->variables[exp->vars_num].value = DEFAULT_VAR_VALUE;
+
+    node->data = exp->vars_num;
+    node->type = T_VAR;
+
+    exp->vars_num ++;
 }
 
 

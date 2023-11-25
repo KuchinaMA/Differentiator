@@ -48,7 +48,7 @@ int main() {
     FILE* tex = fopen("TreeDumpTex4.txt", "w");
     print_tree_tex(exp, tex);
 
-    //graph_dump(exp);
+    graph_dump(exp);
 
     MathExpression* new_exp = diff_expression(exp);
 

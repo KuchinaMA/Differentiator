@@ -60,6 +60,9 @@ int tree_dtor(Tree* tree);
 
 MathExpression* read_data(FILE* file);
 Node* read_node(FILE* file, MathExpression* exp);
+void read_operation(FILE* file, MathExpression* exp, Node* node);
+void read_variable(FILE* file, MathExpression* exp, Node* node, char* current);
+
 int count_nodes(FILE* file);
 
 int tree_calculate(Node* node);

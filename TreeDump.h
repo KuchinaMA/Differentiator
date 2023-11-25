@@ -17,7 +17,7 @@ void print_num(const MathExpression* expression, const Node* node, FILE* output)
 void print_oper(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position);
 void print_var(const MathExpression* expression, const Node* node, FILE* output);
 
-char operation_to_sign(const Node* node);
+char* operation_to_sign(const Node* node);
 int compare_operations(int parent_op, int cur_op, int position);
 
 int graph_dump(const MathExpression* expression);

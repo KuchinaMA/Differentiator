@@ -55,6 +55,9 @@ Node* diff_operation(const Node* node) {
 
         case DIV:
             return diff_div(node);
+
+        case LN:
+            return diff_ln(node);
     }
 }
 
@@ -88,6 +91,16 @@ Node* diff_div(const Node* node) {
 
     Node* numerator = node_ctor(T_OP, SUB, numerator_left, numerator_right);
     Node* denominator = node_ctor(T_OP, MUL, cR, cR);
+
+    return node_ctor(T_OP, DIV, numerator, denominator);
+}
+
+Node* diff_ln(const Node* node) {
+
+    assert(node);
+
+    Node* numerator = node_ctor(T_NUM, 1, NULL, NULL);
+    Node* denominator = copy_node(node->right);
 
     return node_ctor(T_OP, DIV, numerator, denominator);
 }
