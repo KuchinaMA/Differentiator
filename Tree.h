@@ -18,6 +18,14 @@ enum Operations {
     SUB = 22,
     MUL = 23,
     DIV = 24,
+
+    LN  = 25,
+    POW = 26,
+
+    SIN = 27,
+    COS = 28,
+    TAN = 29,
+    CTG = 30,
 };
 
 struct Node {
@@ -58,5 +66,7 @@ int tree_calculate(Node* node);
 
 MathExpression* expression_ctor(Tree* tree);
 int expression_dtor(MathExpression* expression);
+
+void copy_variables(MathExpression* new_exp, const MathExpression* old_exp);
 
 #endif // TREE_H_INCLUDED

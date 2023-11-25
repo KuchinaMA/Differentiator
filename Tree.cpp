@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <math.h>
 
 #include "Tree.h"
 
@@ -103,6 +104,8 @@ int tree_calculate(Node* node) {
 
 MathExpression* expression_ctor(Tree* tree) {
 
+    assert(tree);
+
     MathExpression* expression = (MathExpression*)calloc(1, sizeof(MathExpression));
     expression->tree = tree;
 
@@ -133,6 +136,8 @@ int expression_dtor(MathExpression* expression) {
 
 
 Node* read_node(FILE* file, MathExpression* exp) {
+
+    assert(exp);
 
     char current[MAX_LINE_LEN] = "";
 
@@ -230,6 +235,20 @@ MathExpression* read_data(FILE* file) {
     //printf("%lld\n", new_exp->vars_num);
 
     return new_exp;
+}
+
+
+
+void copy_variables(MathExpression* new_exp, const MathExpression* old_exp) {
+
+    assert(new_exp);
+    assert(old_exp);
+
+    for (size_t i = 0; i < old_exp->vars_num; i++)
+    {
+        new_exp->variables[i].name  = strdup(old_exp->variables[i].name);
+        new_exp->variables[i].value = old_exp->variables[i].value;
+    }
 }
 
 

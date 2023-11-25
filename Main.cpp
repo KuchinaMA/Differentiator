@@ -27,7 +27,7 @@ int main() {
     fclose(output);
     tree_dtor(tree1);*/
 
-    FILE* input = fopen("TestData3.txt", "r");
+    FILE* input = fopen("TestData4.txt", "r");
     /*Tree* tree2 = read_data(input);
 
     MathExpression* exp = expression_ctor(tree2);
@@ -37,23 +37,27 @@ int main() {
 
 
     MathExpression* exp = read_data(input);
-    printf("%d    %s    %d", exp->vars_num, exp->variables[0].name, exp->variables[0].value);
+    /*printf("%d    %s    %d", exp->vars_num, exp->variables[0].name, exp->variables[0].value);
     printf("      %s    %d", exp->variables[1].name, exp->variables[1].value);
-    printf("      %s    %d", exp->variables[2].name, exp->variables[2].value);
+    printf("      %s    %d", exp->variables[2].name, exp->variables[2].value);*/
 
 
-    FILE* output3 = fopen("TreeDump3.txt", "w");
-    print_tree_in(exp, output3);
+    FILE* output4 = fopen("TreeDump4.txt", "w");
+    print_tree_in(exp, output4);
 
-    FILE* tex = fopen("TreeDumpTex3.txt", "w");
+    FILE* tex = fopen("TreeDumpTex4.txt", "w");
     print_tree_tex(exp, tex);
 
-    graph_dump(exp);
+    //graph_dump(exp);
+
+    MathExpression* new_exp = diff_expression(exp);
+
+    graph_dump(new_exp);
 
     //int res = tree_calculate(tree2->root);
     //printf("%d", res);
 
-    fclose(output3);
+    fclose(output4);
     fclose(tex);
     //tree_dtor(tree2);
 
