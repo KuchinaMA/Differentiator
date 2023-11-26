@@ -22,5 +22,8 @@ bool find_var(Node *node);
 
 MathExpression* diff_expression(MathExpression* expression);
 
+void remove_const_values(Node* node, bool* changes);
+void remove_neutral_elements(Node** node, bool* changes);
+
 
 #endif // DIFF_H_INCLUDED

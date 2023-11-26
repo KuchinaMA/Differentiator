@@ -245,6 +245,142 @@ bool find_var(Node *node) {
     return false;
 }
 
+void remove_const_values(Node* node, bool* changes) {
+
+    assert(node);
+
+    if (node->left != NULL)
+        remove_const_values(node->left, changes);
+
+    if (node->right != NULL)
+        remove_const_values(node->right, changes);
+
+    if (node->type == T_OP && node->left != NULL && node->right != NULL) {
+
+        if (!find_var(node->left) && !find_var(node->right)) {
+
+            *changes = true;
+
+            int subtree_value = tree_calculate(node);
+            node->type = T_NUM;
+            node->data = subtree_value;
+
+            node_dtor(node->left);
+            node_dtor(node->right);
+
+            node->left = NULL;
+            node->right = NULL;
+        }
+
+    }
+}
+
+void remove_neutral_elements(Node** node, bool* changes) {
+
+    assert(node);
+
+    if ((*node)->left != NULL)
+        remove_neutral_elements(&((*node)->left), changes);
+
+    if ((*node)->right != NULL)
+        remove_neutral_elements(&((*node)->right), changes);
+
+    if ((*node)->type == T_OP && (*node)->data == ADD) {
+
+        if ((*node)->left->type == T_NUM && (*node)->left->data == 0) {
+
+            *changes = true;
+
+            node_dtor((*node)->left);
+            *node = (*node)->right;
+            /*Node* new_node = copy_node((*node)->right);
+            *node = new_node; */
+        }
+
+        else if ((*node)->right->type == T_NUM && (*node)->right->data == 0) {
+
+            *changes = true;
+
+            node_dtor((*node)->right);
+            *node = (*node)->left;
+        }
+    }
+
+    else if ((*node)->type == T_OP && (*node)->data == MUL) {
+
+        if (((*node)->left->type == T_NUM && (*node)->left->data == 0) ||
+            ((*node)->right->type == T_NUM &&  (*node)->right->data == 0)) {
+
+            *changes = true;
+
+            (*node)->type = T_NUM;
+            (*node)->data = 0;
+
+            node_dtor((*node)->left);
+            node_dtor((*node)->right);
+
+            (*node)->left = NULL;
+            (*node)->right = NULL;
+        }
+
+        else if ((*node)->left->type == T_NUM && (*node)->left->data == 1) {
+
+            *changes = true;
+
+            node_dtor((*node)->left);
+            *node = (*node)->right;
+        }
+
+        else if ((*node)->right->type == T_NUM && (*node)->right->data == 1) {
+
+            *changes = true;
+
+            node_dtor((*node)->right);
+            *node = (*node)->left;
+        }
+    }
+
+    else if ((*node)->type == T_OP && (*node)->data == POW) {
+
+        if ((*node)->right->type == T_NUM && (*node)->right->data == 0) {
+
+            *changes = true;
+
+            (*node)->type = T_NUM;
+            (*node)->data = 1;
+
+            node_dtor((*node)->left);
+            node_dtor((*node)->right);
+
+            (*node)->left = NULL;
+            (*node)->right = NULL;
+        }
+
+        else if ((*node)->right->type == T_NUM && (*node)->right->data == 1) {
+
+            *changes = true;
+
+            node_dtor((*node)->right);
+            *node = (*node)->left;
+        }
+    }
+
+    //if (*changes == true)
+        //printf("%d\n", (*node)->data);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

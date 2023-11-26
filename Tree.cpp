@@ -96,18 +96,18 @@ int tree_calculate(Node* node) {
                 return left * right;
             case DIV:
                 return left / right;
-            case LN:
-                return log(right);
+            //case LN:
+                //return log(right);
             case POW:
                 return pow(left, right);
-            case SIN:
+            /*case SIN:
                 return sin(right);
             case COS:
                 return cos(right);
             case TAN:
                 return tan(right);
             case CTG:
-                return 1 / tan(right);
+                return 1 / tan(right);*/
         }
     }
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 
 #include "Tree.h"
 #include "TreeDump.h"
@@ -24,7 +25,7 @@ void print_data(const Node* node, FILE* output) {
             fprintf(output, " %d", node->data);
             break;
         case T_OP:
-            fprintf(output, " %c", operation_to_sign(node));
+            fprintf(output, " %s", operation_to_sign(node));
             break;
     }
 }
@@ -60,7 +61,7 @@ void print_oper(const MathExpression* expression, const Node* node, FILE* output
     if (bracket)
         fprintf(output, " (");
     print_node_in(expression, node->left, output, node->data, LEFT);
-    fprintf(output, " %c", operation_to_sign(node));
+    fprintf(output, " %s", operation_to_sign(node));
     print_node_in(expression, node->right, output, node->data, RIGHT);
     if (bracket)
         fprintf(output, " )");
@@ -74,20 +75,29 @@ void print_var(const MathExpression* expression, const Node* node, FILE* output)
 }
 
 
-char operation_to_sign(const Node* node) {
+char* operation_to_sign(const Node* node) {
+
     switch (node->data) {
         case ADD:
-            return '+';
-            break;
+            return "+";
         case SUB:
-            return '-';
-            break;
+            return "-";
         case MUL:
-            return '*';
-            break;
+            return "*";
         case DIV:
-            return '/';
-            break;
+            return "/";
+        case LN:
+            return "ln";
+        case POW:
+            return "^";
+        case SIN:
+            return "sin";
+        case COS:
+            return "cos";
+        case TAN:
+            return "tan";
+        case CTG:
+            return "ctg";
     }
 }
 
@@ -130,7 +140,7 @@ int compare_operations(int parent_op, int cur_op, int position) {
 
 int graph_dump(const MathExpression* expression) {
 
-    FILE* dotfile = fopen("TreePicture3.dot", "w");
+    FILE* dotfile = fopen("TreePicture4.dot", "w");
 
     fprintf(dotfile, "digraph {\n");
     fprintf(dotfile, "  rankdir = HR;\n");
@@ -143,7 +153,7 @@ int graph_dump(const MathExpression* expression) {
 
     fclose(dotfile);
 
-    system("dot TreePicture3.dot -T png -o TreePicture3.png");
+    system("dot TreePicture4.dot -T png -o TreePicture4.png");
 
     return 0;
 }
@@ -156,7 +166,7 @@ void node_graph_dump(const MathExpression* expression, const Node* node, FILE* d
     if (node->type == T_NUM)
         fprintf(dotfile, "  node_%p[label = \" %d \"]; \n", node, node->data);
     else if (node->type == T_OP)
-        fprintf(dotfile, "  node_%p[label = \" %c \", color = \"#000066\", style = filled, fillcolor = \"#D5EAFF\"]; \n", node, operation_to_sign(node));
+        fprintf(dotfile, "  node_%p[label = \" %s \", color = \"#000066\", style = filled, fillcolor = \"#D5EAFF\"]; \n", node, operation_to_sign(node));
     else if (node->type == T_VAR)
         fprintf(dotfile, "  node_%p[label = \" %s \", color = \"#660033\", style = filled, fillcolor = \"#FFD5EA\"]; \n", node, expression->variables[node->data].name);
     node_graph_dump(expression, node->left, dotfile);
@@ -215,10 +225,10 @@ void print_oper_tex(const MathExpression* expression, const Node* node, FILE* ou
 
         print_node_tex(expression, node->left, output, node->data, LEFT);
 
-        if (node->data == ADD || node->data == SUB)
-            fprintf(output, " %c", operation_to_sign(node));
-        else
+        if (node->data == MUL)
             fprintf(output, " \\cdot");
+        else
+            fprintf(output, " %s", operation_to_sign(node));
 
         print_node_tex(expression, node->right, output, node->data, RIGHT);
 

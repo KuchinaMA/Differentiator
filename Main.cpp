@@ -6,35 +6,7 @@
 
 int main() {
 
-    /*Node* node300 = node_ctor(T_NUM, 300, 0, 0);
-    Node* node100 = node_ctor(T_NUM, 100, 0, 0);
-
-    Node* node_sub1 = node_ctor(T_OPER, SUB, node300, node100);
-
-    Node* node3 = node_ctor(T_NUM, 30, 0, 0);
-    Node* node10 = node_ctor(T_NUM, 10, 0, 0);
-
-    Node* node_sub2 = node_ctor(T_OPER, SUB, node3, node10);
-
-    Node* node_div = node_ctor(T_OPER, DIV, node_sub1, node_sub2);
-
-    Tree* tree1 = tree_ctor(node_div, 7);
-
-    FILE* output = fopen("TreeDump.txt", "w");
-    print_node_in(tree1->root, output);
-    graph_dump(tree1);
-
-    fclose(output);
-    tree_dtor(tree1);*/
-
-    FILE* input = fopen("TestData5.txt", "r");
-    /*Tree* tree2 = read_data(input);
-
-    MathExpression* exp = expression_ctor(tree2);
-    exp->vars_num = 1;
-    exp->variables[0].name = "x";
-    exp->variables[0].value = 0;*/
-
+    FILE* input = fopen("TestData4.txt", "r");
 
     MathExpression* exp = read_data(input);
     /*printf("%d    %s    %d", exp->vars_num, exp->variables[0].name, exp->variables[0].value);
@@ -42,28 +14,29 @@ int main() {
     printf("      %s    %d", exp->variables[2].name, exp->variables[2].value);*/
 
 
-    FILE* output5 = fopen("TreeDump5.txt", "w");
+    FILE* output5 = fopen("TreeDump4.txt", "w");
     print_tree_in(exp, output5);
 
-    FILE* tex = fopen("TreeDumpTex5.txt", "w");
+    FILE* tex = fopen("TreeDumpTex4.txt", "w");
     print_tree_tex(exp, tex);
 
     graph_dump(exp);
 
     MathExpression* new_exp = diff_expression(exp);
 
-    FILE* diff = fopen("TreeDumpDiff5.txt", "w");
+    FILE* diff = fopen("TreeDumpDiff4.txt", "w");
     print_tree_tex(new_exp, diff);
 
-    graph_dump(new_exp);
 
-    //int res = tree_calculate(tree2->root);
-    //printf("%d", res);
+    bool changes = false;
+    remove_const_values(new_exp->tree->root, &changes);
+    remove_neutral_elements(&(new_exp->tree->root), &changes);
+
+    graph_dump(new_exp);
 
     fclose(output5);
     fclose(tex);
     fclose(diff);
-    //tree_dtor(tree2);
 
     return 0;
 }

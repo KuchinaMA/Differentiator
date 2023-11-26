@@ -1,1 +1,1 @@
-( ctg nil ( mul ( 5 nil nil ) ( x nil nil ) ) )
+( sin nil ( mul ( 5 nil nil ) ( x nil nil ) ) )
