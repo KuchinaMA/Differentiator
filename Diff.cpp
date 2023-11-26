@@ -58,6 +58,21 @@ Node* diff_operation(const Node* node) {
 
         case LN:
             return diff_ln(node);
+
+        case POW:
+            return diff_pow(node);
+
+        case SIN:
+            return diff_sin(node);
+
+        case COS:
+            return diff_cos(node);
+
+        case TAN:
+            return diff_tan(node);
+
+        case CTG:
+            return diff_ctg(node);
     }
 }
 
@@ -102,7 +117,97 @@ Node* diff_ln(const Node* node) {
     Node* numerator = node_ctor(T_NUM, 1, NULL, NULL);
     Node* denominator = copy_node(node->right);
 
-    return node_ctor(T_OP, DIV, numerator, denominator);
+    Node* res = node_ctor(T_OP, DIV, numerator, denominator);
+
+    return node_ctor(T_OP, MUL, res, dR);
+}
+
+Node* diff_pow(const Node* node) {
+
+    assert(node);
+
+    bool basis_var = find_var(node->left);
+    bool indicator_var = find_var(node->right);
+
+    if (!basis_var && !indicator_var)
+        return node_ctor(T_NUM, 0, NULL, NULL);
+
+    else if(basis_var && !indicator_var) {
+
+        Node* multiplier = node_ctor(T_NUM, node->right->data, NULL, NULL);
+        Node* new_indicator = node_ctor(T_NUM, node->right->data - 1, NULL, NULL);
+        Node* new_degree = node_ctor(T_OP, POW, cL, new_indicator);
+
+        Node* res = node_ctor(T_OP, MUL, multiplier, new_degree);
+
+        return node_ctor(T_OP, MUL, res, dL);
+    }
+
+    else if(!basis_var && indicator_var) {
+
+        Node* multiplier = node_ctor(T_OP, LN, NULL, cL);
+        Node* new_node = copy_node(node);
+        Node* res = node_ctor(T_OP, MUL, multiplier, new_node);
+
+        return node_ctor(T_OP, MUL, res, dR);
+    }
+
+    else
+        printf("I can't calculate this derivative yet:(\n");
+
+}
+
+
+
+
+Node* diff_sin(const Node* node) {
+
+    assert(node);
+
+    Node* res = node_ctor(T_OP, COS, NULL, cR);
+
+    return node_ctor(T_OP, MUL, res, dR);
+}
+
+Node* diff_cos(const Node* node) {
+
+    assert(node);
+
+    Node* new_node = node_ctor(T_OP, SIN, NULL, cR);
+    Node* minus_mul = node_ctor(T_NUM, -1, NULL, NULL);
+    Node* res = node_ctor(T_OP, MUL, minus_mul, new_node);
+
+    return node_ctor(T_OP, MUL, res, dR);
+}
+
+Node* diff_tan(const Node* node) {
+
+    assert(node);
+
+    Node* numerator = node_ctor(T_NUM, 1, NULL, NULL);
+
+    Node* cos_node1 = node_ctor(T_OP, COS, NULL, cR);
+    Node* cos_node2 = node_ctor(T_OP, COS, NULL, cR);
+    Node* denominator = node_ctor(T_OP, MUL, cos_node1, cos_node2);
+
+    Node* res = node_ctor(T_OP, DIV, numerator, denominator);
+
+    return node_ctor(T_OP, MUL, res, dR);
+}
+
+Node* diff_ctg(const Node* node) {
+
+    assert(node);
+
+    Node* numerator = node_ctor(T_NUM, -1, NULL, NULL);
+
+    Node* cos_node1 = node_ctor(T_OP, SIN, NULL, cR);
+    Node* cos_node2 = node_ctor(T_OP, SIN, NULL, cR);
+    Node* denominator = node_ctor(T_OP, MUL, cos_node1, cos_node2);
+
+    Node* res = node_ctor(T_OP, DIV, numerator, denominator);
+
+    return node_ctor(T_OP, MUL, res, dR);
 }
 
 
@@ -118,6 +223,26 @@ MathExpression* diff_expression(MathExpression* expression) {
     copy_variables(new_expression, expression);
 
     return new_expression;
+}
+
+bool find_var(Node *node) {
+
+    assert(node);
+
+    if (node->type == T_VAR)
+        return true;
+
+    if (node->left != NULL) {
+        if (find_var(node->left))
+            return true;
+    }
+
+    if (node->right != NULL) {
+        if (find_var(node->right))
+            return true;
+    }
+
+    return false;
 }
 
 
