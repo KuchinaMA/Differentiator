@@ -293,8 +293,7 @@ void remove_neutral_elements(Node** node, bool* changes) {
 
             node_dtor((*node)->left);
             *node = (*node)->right;
-            /*Node* new_node = copy_node((*node)->right);
-            *node = new_node; */
+
         }
 
         else if ((*node)->right->type == T_NUM && (*node)->right->data == 0) {
@@ -364,9 +363,23 @@ void remove_neutral_elements(Node** node, bool* changes) {
             *node = (*node)->left;
         }
     }
+}
 
-    //if (*changes == true)
-        //printf("%d\n", (*node)->data);
+
+void simplify_expression(Node** node) {
+
+    assert(node);
+
+    bool changes = false;
+
+    do {
+
+        changes = false;
+
+        remove_const_values(*node, &changes);
+        remove_neutral_elements(node, &changes);
+    }
+    while(changes);
 }
 
 
