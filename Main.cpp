@@ -6,10 +6,10 @@
 
 int main() {
 
-    FILE* input = fopen("TestData5.txt", "r");
-    FILE* output5 = fopen("TreeDump5.txt", "w");
-    FILE* tex = fopen("TreeDumpTex5.txt", "w");
-    FILE* diff = fopen("TreeDumpDiff5.txt", "w");
+    FILE* input = fopen("TestData4.txt", "r");
+    FILE* output5 = fopen("TreeDump4.txt", "w");
+    FILE* tex = fopen("TreeDumpTex4.txt", "w");
+    FILE* diff = fopen("TreeDumpDiff4.txt", "w");
 
     MathExpression* exp = read_data(input);
 
@@ -18,7 +18,15 @@ int main() {
 
     graph_dump(exp);
 
+
+    fprintf(diff, "Продифференцируем выражение:\n");
+    print_tree_tex(exp, diff);
+    fprintf(diff, "\n\n");
     MathExpression* new_exp = diff_expression(exp);
+
+    fprintf(diff, "После дифференцирования получим: \n");
+    print_tree_tex(new_exp, diff);
+    fprintf(diff, "\n");
     simplify_expression(new_exp, diff);
 
     graph_dump(new_exp);
