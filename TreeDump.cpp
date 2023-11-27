@@ -140,7 +140,7 @@ int compare_operations(int parent_op, int cur_op, int position) {
 
 int graph_dump(const MathExpression* expression) {
 
-    FILE* dotfile = fopen("TreePicture5.dot", "w");
+    FILE* dotfile = fopen("TreePicture4.dot", "w");
 
     fprintf(dotfile, "digraph {\n");
     fprintf(dotfile, "  rankdir = HR;\n");
@@ -153,7 +153,7 @@ int graph_dump(const MathExpression* expression) {
 
     fclose(dotfile);
 
-    system("dot TreePicture5.dot -T png -o TreePicture5.png");
+    system("dot TreePicture4.dot -T png -o TreePicture4.png");
 
     return 0;
 }
