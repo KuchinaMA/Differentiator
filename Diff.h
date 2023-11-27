@@ -1,6 +1,8 @@
 #ifndef DIFF_H_INCLUDED
 #define DIFF_H_INCLUDED
 
+const size_t NUMBER_OF_STRINGS = 5;
+
 Node* derivative(const Node* node);
 
 Node* diff_operation(const Node* node);
@@ -24,7 +26,7 @@ MathExpression* diff_expression(MathExpression* expression);
 
 void remove_const_values(Node* node, bool* changes);
 void remove_neutral_elements(Node** node, bool* changes);
-void simplify_expression(Node** node);
+void simplify_expression(MathExpression* expression, FILE* output);
 
 
 #endif // DIFF_H_INCLUDED

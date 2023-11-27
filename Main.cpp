@@ -19,11 +19,11 @@ int main() {
     graph_dump(exp);
 
     MathExpression* new_exp = diff_expression(exp);
-    simplify_expression(&(new_exp->tree->root));
+    simplify_expression(new_exp, diff);
 
     graph_dump(new_exp);
 
-    print_tree_tex(new_exp, diff);
+    //print_tree_tex(new_exp, diff);
 
     expression_dtor(exp);
     fclose(input);

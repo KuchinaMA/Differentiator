@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "Tree.h"
+#include "TreeDump.h"
 #include "Diff.h"
 
 #define dL derivative(node->left)
@@ -366,7 +367,7 @@ void remove_neutral_elements(Node** node, bool* changes) {
 }
 
 
-void simplify_expression(Node** node) {
+/*void simplify_expression(Node** node) {
 
     assert(node);
 
@@ -378,6 +379,50 @@ void simplify_expression(Node** node) {
 
         remove_const_values(*node, &changes);
         remove_neutral_elements(node, &changes);
+    }
+    while(changes);
+} */
+
+
+void simplify_expression(MathExpression* expression, FILE* output) {
+
+    assert(expression);
+
+    char* connecting_phrases[NUMBER_OF_STRINGS] = {
+
+        "Ќесложно заметить, что:",
+        "ѕосле несложных математических преобразований получим:",
+        "ќчевидно, что:",
+        "ѕреобразуем полученное выражение:",
+        "ƒоказательство этого перехода элементарно и предотавл€етс€ читателю в качестве упражнени€:"
+    };
+
+    bool changes = false;
+
+    do {
+
+        changes = false;
+
+        remove_const_values(expression->tree->root, &changes);
+
+        if (changes) {
+            int phrase_number = rand() % NUMBER_OF_STRINGS;
+            fprintf(output, "%s\n", connecting_phrases[phrase_number]);
+            print_tree_tex(expression, output);
+            fprintf(output, "\n");
+            changes = false;
+        }
+
+        remove_neutral_elements(&(expression->tree->root), &changes);
+
+        if (changes) {
+            int phrase_number = rand() % NUMBER_OF_STRINGS;
+            fprintf(output, "%s\n", connecting_phrases[phrase_number]);
+            print_tree_tex(expression, output);
+            fprintf(output, "\n");
+            changes = false;
+        }
+
     }
     while(changes);
 }
