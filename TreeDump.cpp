@@ -218,6 +218,14 @@ void print_oper_tex(const MathExpression* expression, const Node* node, FILE* ou
         fprintf(output, "}");
     }
 
+    else if (node->data == POW) {
+
+        print_node_tex(expression, node->left, output, node->data, LEFT);
+        fprintf(output, " %s {", operation_to_sign(node));
+        print_node_tex(expression, node->right, output, node->data, RIGHT);
+        fprintf(output, "}");
+    }
+
     else {
         int bracket = compare_operations_tex(parent_data, node->data, position);
         if (bracket)
@@ -239,31 +247,56 @@ void print_oper_tex(const MathExpression* expression, const Node* node, FILE* ou
 
 int compare_operations_tex(int parent_op, int cur_op, int position) {
 
-    if (parent_op == ADD)
-        return 0;
+    switch(parent_op) {
 
-    else if (parent_op == SUB) {
-        if (cur_op == ADD || cur_op == SUB) {
+        case ADD:
+            return 0;
+
+        case SUB:
+
+            if (cur_op == ADD || cur_op == SUB) {
             if (position == RIGHT)
                 return 1;
-        }
-        else
-            return 0;
-    }
+            }
+            else
+                return 0;
 
-    else if (parent_op == MUL) {
-        if (cur_op == MUL || cur_op == DIV)
+        case MUL:
+
+            if (cur_op == ADD || cur_op == SUB)
+                return 1;
+
+            else
+                return 0;
+
+        case DIV:
             return 0;
 
-        else
+        case POW:
+            if (position == LEFT)
+                return 1;
+            else
+                return 0;
+
+        case LN:
             return 1;
+
+        case SIN:
+            return 1;
+
+        case COS:
+            return 1;
+
+        case TAN:
+            return 1;
+
+        case CTG:
+            return 1;
+
+        case BEGIN_OP:
+            return 0;
     }
 
-    else if (parent_op == DIV)
-        return 0;
-
-    else if (parent_op == BEGIN_OP)
-        return 0;
 }
 
 
