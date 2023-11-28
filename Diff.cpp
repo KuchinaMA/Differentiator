@@ -159,8 +159,6 @@ Node* diff_pow(const Node* node) {
 }
 
 
-
-
 Node* diff_sin(const Node* node) {
 
     assert(node);
@@ -276,92 +274,93 @@ void remove_const_values(Node* node, bool* changes) {
     }
 }
 
-void remove_neutral_elements(Node** node, bool* changes) {
+
+void remove_neutral_elements(Node* node, bool* changes) {
 
     assert(node);
 
-    if ((*node)->left != NULL)
-        remove_neutral_elements(&((*node)->left), changes);
+    if (node->left != NULL)
+        remove_neutral_elements(node->left, changes);
 
-    if ((*node)->right != NULL)
-        remove_neutral_elements(&((*node)->right), changes);
+    if (node->right != NULL)
+        remove_neutral_elements(node->right, changes);
 
-    if ((*node)->type == T_OP && (*node)->data == ADD) {
+    if (node->type == T_OP && node->data == ADD) {
 
-        if ((*node)->left->type == T_NUM && (*node)->left->data == 0) {
+        if (node->left->type == T_NUM && node->left->data == 0) {
 
             *changes = true;
 
-            node_dtor((*node)->left);
-            *node = (*node)->right;
+            node_dtor(node->left);
+            *node = *node->right;
 
         }
 
-        else if ((*node)->right->type == T_NUM && (*node)->right->data == 0) {
+        else if (node->right->type == T_NUM && node->right->data == 0) {
 
             *changes = true;
 
-            node_dtor((*node)->right);
-            *node = (*node)->left;
-        }
-    }
-
-    else if ((*node)->type == T_OP && (*node)->data == MUL) {
-
-        if (((*node)->left->type == T_NUM && (*node)->left->data == 0) ||
-            ((*node)->right->type == T_NUM &&  (*node)->right->data == 0)) {
-
-            *changes = true;
-
-            (*node)->type = T_NUM;
-            (*node)->data = 0;
-
-            node_dtor((*node)->left);
-            node_dtor((*node)->right);
-
-            (*node)->left = NULL;
-            (*node)->right = NULL;
-        }
-
-        else if ((*node)->left->type == T_NUM && (*node)->left->data == 1) {
-
-            *changes = true;
-
-            node_dtor((*node)->left);
-            *node = (*node)->right;
-        }
-
-        else if ((*node)->right->type == T_NUM && (*node)->right->data == 1) {
-
-            *changes = true;
-
-            node_dtor((*node)->right);
-            *node = (*node)->left;
+            node_dtor(node->right);
+            *node = *node->left;
         }
     }
 
-    else if ((*node)->type == T_OP && (*node)->data == POW) {
+    else if (node->type == T_OP && node->data == MUL) {
 
-        if ((*node)->right->type == T_NUM && (*node)->right->data == 0) {
+        if ((node->left->type == T_NUM && node->left->data == 0) ||
+            (node->right->type == T_NUM &&  node->right->data == 0)) {
 
             *changes = true;
 
-            (*node)->type = T_NUM;
-            (*node)->data = 1;
+            node->type = T_NUM;
+            node->data = 0;
 
-            node_dtor((*node)->left);
-            node_dtor((*node)->right);
+            node_dtor(node->left);
+            node_dtor(node->right);
 
-            (*node)->left = NULL;
-            (*node)->right = NULL;
+            node->left = NULL;
+            node->right = NULL;
         }
 
-        else if ((*node)->right->type == T_NUM && (*node)->right->data == 1) {
+        else if (node->left->type == T_NUM && node->left->data == 1) {
 
             *changes = true;
 
-            node_dtor((*node)->right);
-            *node = (*node)->left;
+            node_dtor(node->left);
+            *node = *node->right;
+        }
+
+        else if (node->right->type == T_NUM && node->right->data == 1) {
+
+            *changes = true;
+
+            node_dtor(node->right);
+            *node = *node->left;
+        }
+    }
+
+    else if (node->type == T_OP && node->data == POW) {
+
+        if (node->right->type == T_NUM && node->right->data == 0) {
+
+            *changes = true;
+
+            node->type = T_NUM;
+            node->data = 1;
+
+            node_dtor(node->left);
+            node_dtor(node->right);
+
+            node->left = NULL;
+            node->right = NULL;
+        }
+
+        else if (node->right->type == T_NUM && node->right->data == 1) {
+
+            *changes = true;
+
+            node_dtor(node->right);
+            *node = *node->left;
         }
     }
 }
@@ -413,7 +412,7 @@ void simplify_expression(MathExpression* expression, FILE* output) {
             changes = false;
         }
 
-        remove_neutral_elements(&(expression->tree->root), &changes);
+        remove_neutral_elements(expression->tree->root, &changes);
 
         if (changes) {
             int phrase_number = rand() % NUMBER_OF_STRINGS;
