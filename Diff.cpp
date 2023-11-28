@@ -5,6 +5,7 @@
 #include "Tree.h"
 #include "TreeDump.h"
 #include "Diff.h"
+#include "ReadData.h"
 
 #define dL derivative(node->left)
 #define dR derivative(node->right)
@@ -387,14 +388,9 @@ void simplify_expression(MathExpression* expression, FILE* output) {
 
     assert(expression);
 
-    char* connecting_phrases[NUMBER_OF_STRINGS] = {
+    TextData* phrases_data = (TextData*)calloc(1, sizeof(TextData));
 
-        "Ќесложно заметить, что:",
-        "ѕосле несложных математических преобразований получим:",
-        "ќчевидно, что:",
-        "ѕреобразуем полученное выражение:",
-        "ƒоказательство этого перехода элементарно и предотавл€етс€ читателю в качестве упражнени€:"
-    };
+    read_from_file("Phrases.txt", phrases_data);
 
     bool changes = false;
 
@@ -406,7 +402,7 @@ void simplify_expression(MathExpression* expression, FILE* output) {
 
         if (changes) {
             int phrase_number = rand() % NUMBER_OF_STRINGS;
-            fprintf(output, "%s\n", connecting_phrases[phrase_number]);
+            fprintf(output, "%s", phrases_data->text[phrase_number].pointer);
             print_tree_tex(expression, output);
             fprintf(output, "\n");
             changes = false;
@@ -416,7 +412,7 @@ void simplify_expression(MathExpression* expression, FILE* output) {
 
         if (changes) {
             int phrase_number = rand() % NUMBER_OF_STRINGS;
-            fprintf(output, "%s\n", connecting_phrases[phrase_number]);
+            fprintf(output, "%s", phrases_data->text[phrase_number].pointer);
             print_tree_tex(expression, output);
             fprintf(output, "\n");
             changes = false;
@@ -424,6 +420,8 @@ void simplify_expression(MathExpression* expression, FILE* output) {
 
     }
     while(changes);
+
+    free(phrases_data);
 }
 
 
