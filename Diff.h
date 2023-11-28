@@ -24,9 +24,10 @@ bool find_var(Node *node);
 
 MathExpression* diff_expression(MathExpression* expression);
 
-void remove_const_values(Node* node, bool* changes);
-void remove_neutral_elements(Node* node, bool* changes);
+void remove_const_values(MathExpression* expression, Node* node, bool* changes, FILE* output, LinesData* text);
+void remove_neutral_elements(MathExpression* expression, Node* node, bool* changes, FILE* output, LinesData* text);
 void simplify_expression(MathExpression* expression, FILE* output);
+void print_phrase(MathExpression* expression, FILE* output, LinesData* text);
 
 
 #endif // DIFF_H_INCLUDED

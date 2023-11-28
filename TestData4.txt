@@ -1,1 +1,1 @@
-( add ( ctg nil ( mul ( 5 nil nil ) ( x nil nil ) ) ) ( pow ( 3 nil nil ) ( add ( 2 nil nil ) ( x nil nil ) ) )
+( div ( add ( tan nil ( mul ( 7 nil nil ) ( x nil nil ) ) ) ( pow ( 78 nil nil ) ( pow ( x nil nil ) ( 16 nil nil ) ) ) ) ( ln nil ( add ( 15 nil nil ) ( x nil nil ) ) ) )

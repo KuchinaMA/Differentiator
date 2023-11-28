@@ -4,8 +4,9 @@
 
 #include "Tree.h"
 #include "TreeDump.h"
-#include "Diff.h"
 #include "ReadData.h"
+#include "Diff.h"
+
 
 #define dL derivative(node->left)
 #define dR derivative(node->right)
@@ -247,15 +248,15 @@ bool find_var(Node *node) {
     return false;
 }
 
-void remove_const_values(Node* node, bool* changes) {
+void remove_const_values(MathExpression* expression, Node* node, bool* changes, FILE* output, LinesData* text) {
 
     assert(node);
 
     if (node->left != NULL)
-        remove_const_values(node->left, changes);
+        remove_const_values(expression, node->left, changes, output, text);
 
     if (node->right != NULL)
-        remove_const_values(node->right, changes);
+        remove_const_values(expression, node->right, changes, output, text);
 
     if (node->type == T_OP && node->left != NULL && node->right != NULL) {
 
@@ -272,21 +273,24 @@ void remove_const_values(Node* node, bool* changes) {
 
             node->left = NULL;
             node->right = NULL;
+
+            print_phrase(expression, output, text);
+
         }
 
     }
 }
 
 
-void remove_neutral_elements(Node* node, bool* changes) {
+void remove_neutral_elements(MathExpression* expression, Node* node, bool* changes, FILE* output, LinesData* text) {
 
     assert(node);
 
     if (node->left != NULL)
-        remove_neutral_elements(node->left, changes);
+        remove_neutral_elements(expression, node->left, changes, output, text);
 
     if (node->right != NULL)
-        remove_neutral_elements(node->right, changes);
+        remove_neutral_elements(expression, node->right, changes, output, text);
 
     if (node->type == T_OP && node->data == ADD) {
 
@@ -297,6 +301,8 @@ void remove_neutral_elements(Node* node, bool* changes) {
             node_dtor(node->left);
             *node = *node->right;
 
+            print_phrase(expression, output, text);
+
         }
 
         else if (node->right->type == T_NUM && node->right->data == 0) {
@@ -305,6 +311,8 @@ void remove_neutral_elements(Node* node, bool* changes) {
 
             node_dtor(node->right);
             *node = *node->left;
+
+            print_phrase(expression, output, text);
         }
     }
 
@@ -323,6 +331,8 @@ void remove_neutral_elements(Node* node, bool* changes) {
 
             node->left = NULL;
             node->right = NULL;
+
+            print_phrase(expression, output, text);
         }
 
         else if (node->left->type == T_NUM && node->left->data == 1) {
@@ -331,6 +341,8 @@ void remove_neutral_elements(Node* node, bool* changes) {
 
             node_dtor(node->left);
             *node = *node->right;
+
+            print_phrase(expression, output, text);
         }
 
         else if (node->right->type == T_NUM && node->right->data == 1) {
@@ -339,6 +351,8 @@ void remove_neutral_elements(Node* node, bool* changes) {
 
             node_dtor(node->right);
             *node = *node->left;
+
+            print_phrase(expression, output, text);
         }
     }
 
@@ -356,6 +370,8 @@ void remove_neutral_elements(Node* node, bool* changes) {
 
             node->left = NULL;
             node->right = NULL;
+
+            print_phrase(expression, output, text);
         }
 
         else if (node->right->type == T_NUM && node->right->data == 1) {
@@ -364,6 +380,8 @@ void remove_neutral_elements(Node* node, bool* changes) {
 
             node_dtor(node->right);
             *node = *node->left;
+
+            print_phrase(expression, output, text);
         }
     }
 }
@@ -382,33 +400,26 @@ void simplify_expression(MathExpression* expression, FILE* output) {
     do {
 
         changes = false;
-
-        remove_const_values(expression->tree->root, &changes);
-
-        if (changes) {
-            int phrase_number = rand() % NUMBER_OF_STRINGS;
-            fprintf(output, "%s", phrases_data->text[phrase_number].pointer);
-            print_tree_tex(expression, output);
-            fprintf(output, "\n");
-            changes = false;
-        }
-
-        remove_neutral_elements(expression->tree->root, &changes);
-
-        if (changes) {
-            int phrase_number = rand() % NUMBER_OF_STRINGS;
-            fprintf(output, "%s", phrases_data->text[phrase_number].pointer);
-            print_tree_tex(expression, output);
-            fprintf(output, "\n");
-            changes = false;
-        }
+        remove_const_values(expression, expression->tree->root, &changes, output, phrases_data->text);
+        remove_neutral_elements(expression, expression->tree->root, &changes, output, phrases_data->text);
 
     }
+
     while(changes);
 
     free(phrases_data);
 }
 
+
+void print_phrase(MathExpression* expression, FILE* output, LinesData* text) {
+
+    assert(expression);
+
+    int phrase_number = rand() % NUMBER_OF_STRINGS;
+    fprintf(output, "%s", text[phrase_number].pointer);
+    print_tree_tex(expression, output);
+    fprintf(output, "\n");
+}
 
 
 
