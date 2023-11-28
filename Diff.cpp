@@ -13,6 +13,16 @@
 #define cL copy_node(node->left)
 #define cR copy_node(node->right)
 
+#define num_node(arg)         node_ctor(T_NUM, arg, NULL, NULL)
+#define add_node(left, right) node_ctor(T_OP, ADD, left, right)
+#define sub_node(left, right) node_ctor(T_OP, SUB, left, right)
+#define mul_node(left, right) node_ctor(T_OP, MUL, left, right)
+#define div_node(left, right) node_ctor(T_OP, DIV, left, right)
+#define pow_node(left, right) node_ctor(T_OP, POW, left, right)
+#define ln_node(arg)          node_ctor(T_OP, LN, NULL, arg)
+#define sin_node(arg)         node_ctor(T_OP, SIN, NULL, arg)
+#define cos_node(arg)         node_ctor(T_OP, COS, NULL, arg)
+
 
 Node* derivative(const Node* node) {
 
@@ -20,20 +30,14 @@ Node* derivative(const Node* node) {
 
     switch (node->type) {
 
-        case T_NUM: {
-            Node* new_node = node_ctor(T_NUM, 0, NULL, NULL);
-            return new_node;
-        }
+        case T_NUM:
+            return num_node(0);
 
-        case T_VAR: {
-            Node* new_node = node_ctor(T_NUM, 1, NULL, NULL);
-            return new_node;
-        }
+        case T_VAR:
+            return num_node(1);
 
-        case T_OP: {
-            Node* new_node = diff_operation(node);
-            return new_node;
-        }
+        case T_OP:
+            return diff_operation(node);
 
     }
 
@@ -47,10 +51,10 @@ Node* diff_operation(const Node* node) {
     switch(node->data) {
 
         case ADD:
-            return node_ctor(T_OP, ADD, dL, dR);
+            return add_node(dL, dR);
 
         case SUB:
-            return node_ctor(T_OP, SUB, dL, dR);
+            return sub_node(dL, dR);
 
         case MUL:
             return diff_mul(node);
@@ -93,35 +97,33 @@ Node* diff_mul(const Node* node) {
 
     assert(node);
 
-    Node* new_left = node_ctor(T_OP, MUL, dL, cR);
-    Node* new_right = node_ctor(T_OP, MUL, cL, dR);
+    Node* new_left = mul_node(dL, cR);
+    Node* new_right = mul_node(cL, dR);
 
-    return node_ctor(T_OP, ADD, new_left, new_right);
+    return add_node(new_left, new_right);
 }
 
 Node* diff_div(const Node* node) {
 
     assert(node);
 
-    Node* numerator_left = node_ctor(T_OP, MUL, dL, cR);
-    Node* numerator_right = node_ctor(T_OP, MUL, cL, dR);
+    Node* numerator_left = mul_node(dL, cR);
+    Node* numerator_right = mul_node(cL, dR);
 
-    Node* numerator = node_ctor(T_OP, SUB, numerator_left, numerator_right);
-    Node* denominator = node_ctor(T_OP, MUL, cR, cR);
+    Node* numerator = sub_node(numerator_left, numerator_right);
+    Node* denominator = mul_node(cR, cR);
 
-    return node_ctor(T_OP, DIV, numerator, denominator);
+    return div_node(numerator, denominator);
 }
 
 Node* diff_ln(const Node* node) {
 
     assert(node);
 
-    Node* numerator = node_ctor(T_NUM, 1, NULL, NULL);
-    Node* denominator = copy_node(node->right);
+    Node* numerator = num_node(1);
+    Node* res = div_node(numerator, cR);
 
-    Node* res = node_ctor(T_OP, DIV, numerator, denominator);
-
-    return node_ctor(T_OP, MUL, res, dR);
+    return mul_node(res, dR);
 }
 
 Node* diff_pow(const Node* node) {
@@ -136,22 +138,22 @@ Node* diff_pow(const Node* node) {
 
     else if(basis_var && !indicator_var) {
 
-        Node* multiplier = node_ctor(T_NUM, node->right->data, NULL, NULL);
-        Node* new_indicator = node_ctor(T_NUM, node->right->data - 1, NULL, NULL);
-        Node* new_degree = node_ctor(T_OP, POW, cL, new_indicator);
+        Node* multiplier = num_node(node->right->data);
+        Node* new_indicator = num_node(node->right->data - 1);
+        Node* new_degree = pow_node(cL, new_indicator);
 
-        Node* res = node_ctor(T_OP, MUL, multiplier, new_degree);
+        Node* res = mul_node(multiplier, new_degree);
 
-        return node_ctor(T_OP, MUL, res, dL);
+        return mul_node(res, dL);
     }
 
     else if(!basis_var && indicator_var) {
 
-        Node* multiplier = node_ctor(T_OP, LN, NULL, cL);
+        Node* multiplier = ln_node(cL);
         Node* new_node = copy_node(node);
-        Node* res = node_ctor(T_OP, MUL, multiplier, new_node);
+        Node* res = mul_node(multiplier, new_node);
 
-        return node_ctor(T_OP, MUL, res, dR);
+        return mul_node(res, dR);
     }
 
     else
@@ -164,50 +166,50 @@ Node* diff_sin(const Node* node) {
 
     assert(node);
 
-    Node* res = node_ctor(T_OP, COS, NULL, cR);
+    Node* res = cos_node(cR);
 
-    return node_ctor(T_OP, MUL, res, dR);
+    return mul_node(res, dR);
 }
 
 Node* diff_cos(const Node* node) {
 
     assert(node);
 
-    Node* new_node = node_ctor(T_OP, SIN, NULL, cR);
-    Node* minus_mul = node_ctor(T_NUM, -1, NULL, NULL);
-    Node* res = node_ctor(T_OP, MUL, minus_mul, new_node);
+    Node* new_node = sin_node(cR);
+    Node* minus_mul = num_node(-1);
+    Node* res = mul_node(minus_mul, new_node);
 
-    return node_ctor(T_OP, MUL, res, dR);
+    return mul_node(res, dR);
 }
 
 Node* diff_tan(const Node* node) {
 
     assert(node);
 
-    Node* numerator = node_ctor(T_NUM, 1, NULL, NULL);
+    Node* numerator = num_node(1);
 
-    Node* cos_node1 = node_ctor(T_OP, COS, NULL, cR);
-    Node* cos_node2 = node_ctor(T_OP, COS, NULL, cR);
-    Node* denominator = node_ctor(T_OP, MUL, cos_node1, cos_node2);
+    Node* cos_node1 = cos_node(cR);
+    Node* cos_node2 = cos_node(cR);
+    Node* denominator = mul_node(cos_node1, cos_node2);
 
-    Node* res = node_ctor(T_OP, DIV, numerator, denominator);
+    Node* res = div_node(numerator, denominator);
 
-    return node_ctor(T_OP, MUL, res, dR);
+    return mul_node(res, dR);
 }
 
 Node* diff_ctg(const Node* node) {
 
     assert(node);
 
-    Node* numerator = node_ctor(T_NUM, -1, NULL, NULL);
+    Node* numerator = num_node(-1);
 
-    Node* cos_node1 = node_ctor(T_OP, SIN, NULL, cR);
-    Node* cos_node2 = node_ctor(T_OP, SIN, NULL, cR);
-    Node* denominator = node_ctor(T_OP, MUL, cos_node1, cos_node2);
+    Node* sin_node1 = sin_node(cR);
+    Node* sin_node2 = sin_node(cR);
+    Node* denominator = mul_node(sin_node1, sin_node2);
 
-    Node* res = node_ctor(T_OP, DIV, numerator, denominator);
+    Node* res = div_node(numerator, denominator);
 
-    return node_ctor(T_OP, MUL, res, dR);
+    return mul_node(res, dR);
 }
 
 
@@ -365,23 +367,6 @@ void remove_neutral_elements(Node* node, bool* changes) {
         }
     }
 }
-
-
-/*void simplify_expression(Node** node) {
-
-    assert(node);
-
-    bool changes = false;
-
-    do {
-
-        changes = false;
-
-        remove_const_values(*node, &changes);
-        remove_neutral_elements(node, &changes);
-    }
-    while(changes);
-} */
 
 
 void simplify_expression(MathExpression* expression, FILE* output) {
