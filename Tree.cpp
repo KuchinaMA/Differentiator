@@ -122,8 +122,8 @@ MathExpression* expression_ctor(Tree* tree) {
     expression->tree = tree;
 
     for (int i = 0; i < MAX_VARS_NUM; i++) {
-        expression->variables[i].name = "";
-        expression->variables[i].value = DEFAULT_VAR_VALUE;
+        expression->variables_table[i].name = "";
+        expression->variables_table[i].value = DEFAULT_VAR_VALUE;
     }
 
     expression->vars_num = 0;
@@ -136,8 +136,8 @@ int expression_dtor(MathExpression* expression) {
     tree_dtor(expression->tree);
 
     for (int i = 0; i < MAX_VARS_NUM; i++) {
-        expression->variables[i].name = "";
-        expression->variables[i].value = DEFAULT_VAR_VALUE;
+        expression->variables_table[i].name = "";
+        expression->variables_table[i].value = DEFAULT_VAR_VALUE;
     }
     expression->vars_num = 0;
 
@@ -255,8 +255,8 @@ void read_variable(FILE* file, MathExpression* exp, Node* node, char* current) {
     assert(exp);
     assert(node);
 
-    exp->variables[exp->vars_num].name = strdup(current);
-    exp->variables[exp->vars_num].value = DEFAULT_VAR_VALUE;
+    exp->variables_table[exp->vars_num].name = strdup(current);
+    exp->variables_table[exp->vars_num].value = DEFAULT_VAR_VALUE;
 
     node->data = exp->vars_num;
     node->type = T_VAR;
@@ -280,8 +280,6 @@ MathExpression* read_data(FILE* file) {
 
     new_exp->tree = new_tree;
 
-    //printf("%lld\n", new_exp->vars_num);
-
     return new_exp;
 }
 
@@ -294,8 +292,8 @@ void copy_variables(MathExpression* new_exp, const MathExpression* old_exp) {
 
     for (size_t i = 0; i < old_exp->vars_num; i++)
     {
-        new_exp->variables[i].name  = strdup(old_exp->variables[i].name);
-        new_exp->variables[i].value = old_exp->variables[i].value;
+        new_exp->variables_table[i].name  = strdup(old_exp->variables_table[i].name);
+        new_exp->variables_table[i].value = old_exp->variables_table[i].value;
     }
 }
 

@@ -47,7 +47,7 @@ struct Variable {
 
 struct MathExpression {
     Tree* tree;
-    Variable variables[MAX_VARS_NUM];
+    Variable variables_table[MAX_VARS_NUM];
     size_t vars_num;
 };
 

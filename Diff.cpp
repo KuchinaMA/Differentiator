@@ -28,7 +28,6 @@
 Node* derivative(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
-    //print_phrase(expression, output, text);
 
     switch (node->type) {
 
@@ -39,14 +38,12 @@ Node* derivative(MathExpression* expression, const Node* node, FILE* output, Lin
         }
 
         case T_VAR: {
-            //return num_node(1);
             Node* res = num_node(1);
             print_phrase_diff(expression, node, res, output, text);
             return res;
         }
 
         case T_OP: {
-            //return diff_operation(expression, node, output, text);
             Node* res = diff_operation(expression, node, output, text);
             print_phrase_diff(expression, node, res, output, text);
             return res;
@@ -446,7 +443,6 @@ void print_phrase_diff(MathExpression* expression, const Node* node, const Node*
     fprintf(output, ")' = ");
     print_node_tex(expression, res, output, BEGIN_OP, MID);
     fprintf(output, "\\]");
-    //print_tree_tex(expression, output);
     fprintf(output, "\n");
 }
 

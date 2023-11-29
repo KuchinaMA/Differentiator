@@ -72,7 +72,7 @@ void print_oper(const MathExpression* expression, const Node* node, FILE* output
 void print_var(const MathExpression* expression, const Node* node, FILE* output) {
 
     print_node_in(expression, node->left, output, node->data, LEFT);
-    fprintf(output, " %s", expression->variables[node->data].name);
+    fprintf(output, " %s", expression->variables_table[node->data].name);
     print_node_in(expression, node->right, output, node->data, RIGHT);
 }
 
@@ -168,9 +168,11 @@ void node_graph_dump(const MathExpression* expression, const Node* node, FILE* d
     if (node->type == T_NUM)
         fprintf(dotfile, "  node_%p[label = \" %d \"]; \n", node, node->data);
     else if (node->type == T_OP)
-        fprintf(dotfile, "  node_%p[label = \" %s \", color = \"#000066\", style = filled, fillcolor = \"#D5EAFF\"]; \n", node, operation_to_sign(node));
+        fprintf(dotfile, "  node_%p[label = \" %s \", color = \"#000066\", style = filled, fillcolor = \"#D5EAFF\"]; \n",
+                            node, operation_to_sign(node));
     else if (node->type == T_VAR)
-        fprintf(dotfile, "  node_%p[label = \" %s \", color = \"#660033\", style = filled, fillcolor = \"#FFD5EA\"]; \n", node, expression->variables[node->data].name);
+        fprintf(dotfile, "  node_%p[label = \" %s \", color = \"#660033\", style = filled, fillcolor = \"#FFD5EA\"]; \n",
+                            node, expression->variables_table[node->data].name);
     node_graph_dump(expression, node->left, dotfile);
     node_graph_dump(expression, node->right, dotfile);
 
@@ -191,15 +193,7 @@ void edge_graph_dump(const Node* node, FILE* dotfile) {
 }
 
 void print_tree_tex(const MathExpression* expression, FILE* output) {
-    /*fprintf(output, "\\documentclass{article}\n");
-    fprintf(output, "\\usepackage[T2A]{fontenc}\n");
-    fprintf(output, "\\usepackage{hyphenat}\n");
-    fprintf(output, "\\usepackage[english, russian]{babel}\n\n");
-    fprintf(output, "\\title{<<В поисках производной>>}\n");
-    fprintf(output, "\\author{Кучина Марина, Б05-332}\n\n");
-    fprintf(output, "\\begin{document}\n");
-    fprintf(output, "\\maketitle\n");
-    fprintf(output, "\%\tableofcontents\n\n"); */
+
     fprintf(output, "\\[");
     print_node_tex(expression, expression->tree->root, output, BEGIN_OP, MID);
     fprintf(output, "\\]");
@@ -313,7 +307,7 @@ int compare_operations_tex(int parent_op, int cur_op, int position) {
 
 void make_tex_file(MathExpression* expression, FILE* output) {
 
-    fprintf(output, "\\documentclass{article}\n");
+    fprintf(output, "\\documentclass{extreport}\n");
     fprintf(output, "\\usepackage[T2A]{fontenc}\n");
     fprintf(output, "\\usepackage{hyphenat}\n");
     fprintf(output, "\\usepackage[english, russian]{babel}\n\n");
