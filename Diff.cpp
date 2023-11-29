@@ -8,8 +8,8 @@
 #include "Diff.h"
 
 
-#define dL derivative(node->left)
-#define dR derivative(node->right)
+#define dL derivative(expression, node->left, output, text)
+#define dR derivative(expression, node->right, output, text)
 
 #define cL copy_node(node->left)
 #define cR copy_node(node->right)
@@ -25,27 +25,39 @@
 #define cos_node(arg)         node_ctor(T_OP, COS, NULL, arg)
 
 
-Node* derivative(const Node* node) {
+Node* derivative(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
+    //print_phrase(expression, output, text);
 
     switch (node->type) {
 
-        case T_NUM:
-            return num_node(0);
+        case T_NUM: {
+            Node* res = num_node(0);
+            print_phrase_diff(expression, node, res, output, text);
+            return res;
+        }
 
-        case T_VAR:
-            return num_node(1);
+        case T_VAR: {
+            //return num_node(1);
+            Node* res = num_node(1);
+            print_phrase_diff(expression, node, res, output, text);
+            return res;
+        }
 
-        case T_OP:
-            return diff_operation(node);
+        case T_OP: {
+            //return diff_operation(expression, node, output, text);
+            Node* res = diff_operation(expression, node, output, text);
+            print_phrase_diff(expression, node, res, output, text);
+            return res;
+        }
 
     }
 
 }
 
 
-Node* diff_operation(const Node* node) {
+Node* diff_operation(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -58,28 +70,28 @@ Node* diff_operation(const Node* node) {
             return sub_node(dL, dR);
 
         case MUL:
-            return diff_mul(node);
+            return diff_mul(expression, node, output, text);
 
         case DIV:
-            return diff_div(node);
+            return diff_div(expression, node, output, text);
 
         case LN:
-            return diff_ln(node);
+            return diff_ln(expression, node, output, text);
 
         case POW:
-            return diff_pow(node);
+            return diff_pow(expression, node, output, text);
 
         case SIN:
-            return diff_sin(node);
+            return diff_sin(expression, node, output, text);
 
         case COS:
-            return diff_cos(node);
+            return diff_cos(expression, node, output, text);
 
         case TAN:
-            return diff_tan(node);
+            return diff_tan(expression, node, output, text);
 
         case CTG:
-            return diff_ctg(node);
+            return diff_ctg(expression, node, output, text);
     }
 }
 
@@ -94,7 +106,7 @@ Node* copy_node(const Node* node) {
 }
 
 
-Node* diff_mul(const Node* node) {
+Node* diff_mul(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -104,7 +116,7 @@ Node* diff_mul(const Node* node) {
     return add_node(new_left, new_right);
 }
 
-Node* diff_div(const Node* node) {
+Node* diff_div(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -117,7 +129,7 @@ Node* diff_div(const Node* node) {
     return div_node(numerator, denominator);
 }
 
-Node* diff_ln(const Node* node) {
+Node* diff_ln(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -127,7 +139,7 @@ Node* diff_ln(const Node* node) {
     return mul_node(res, dR);
 }
 
-Node* diff_pow(const Node* node) {
+Node* diff_pow(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -163,7 +175,7 @@ Node* diff_pow(const Node* node) {
 }
 
 
-Node* diff_sin(const Node* node) {
+Node* diff_sin(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -172,7 +184,7 @@ Node* diff_sin(const Node* node) {
     return mul_node(res, dR);
 }
 
-Node* diff_cos(const Node* node) {
+Node* diff_cos(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -183,7 +195,7 @@ Node* diff_cos(const Node* node) {
     return mul_node(res, dR);
 }
 
-Node* diff_tan(const Node* node) {
+Node* diff_tan(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -198,7 +210,7 @@ Node* diff_tan(const Node* node) {
     return mul_node(res, dR);
 }
 
-Node* diff_ctg(const Node* node) {
+Node* diff_ctg(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
@@ -214,11 +226,14 @@ Node* diff_ctg(const Node* node) {
 }
 
 
-MathExpression* diff_expression(MathExpression* expression) {
+MathExpression* diff_expression(MathExpression* expression, FILE* output) {
 
     assert(expression);
 
-    Node* new_root = derivative(expression->tree->root);
+    TextData* diff_phrases = (TextData*)calloc(1, sizeof(TextData));
+    read_from_file("DiffPhrases.txt", diff_phrases);
+
+    Node* new_root = derivative(expression, expression->tree->root, output, diff_phrases->text);
     Tree* new_tree = tree_ctor(new_root, expression->tree->size);
 
     MathExpression* new_expression = expression_ctor(new_tree);
@@ -392,7 +407,6 @@ void simplify_expression(MathExpression* expression, FILE* output) {
     assert(expression);
 
     TextData* phrases_data = (TextData*)calloc(1, sizeof(TextData));
-
     read_from_file("Phrases.txt", phrases_data);
 
     bool changes = false;
@@ -420,6 +434,23 @@ void print_phrase(MathExpression* expression, FILE* output, LinesData* text) {
     print_tree_tex(expression, output);
     fprintf(output, "\n");
 }
+
+void print_phrase_diff(MathExpression* expression, const Node* node, const Node* res, FILE* output, LinesData* text) {
+
+    assert(expression);
+
+    int phrase_number = rand() % NUMBER_OF_STRINGS;
+    fprintf(output, "%s", text[phrase_number].pointer);
+    fprintf(output, "\\[(");
+    print_node_tex(expression, node, output, BEGIN_OP, MID);
+    fprintf(output, ")' = ");
+    print_node_tex(expression, res, output, BEGIN_OP, MID);
+    fprintf(output, "\\]");
+    //print_tree_tex(expression, output);
+    fprintf(output, "\n");
+}
+
+
 
 
 

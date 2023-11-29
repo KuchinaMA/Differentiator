@@ -4,6 +4,8 @@
 
 #include "Tree.h"
 #include "TreeDump.h"
+#include "ReadData.h"
+#include "Diff.h"
 
 void print_node_pre(const Node* node, FILE* output) {
 
@@ -189,6 +191,15 @@ void edge_graph_dump(const Node* node, FILE* dotfile) {
 }
 
 void print_tree_tex(const MathExpression* expression, FILE* output) {
+    /*fprintf(output, "\\documentclass{article}\n");
+    fprintf(output, "\\usepackage[T2A]{fontenc}\n");
+    fprintf(output, "\\usepackage{hyphenat}\n");
+    fprintf(output, "\\usepackage[english, russian]{babel}\n\n");
+    fprintf(output, "\\title{<<В поисках производной>>}\n");
+    fprintf(output, "\\author{Кучина Марина, Б05-332}\n\n");
+    fprintf(output, "\\begin{document}\n");
+    fprintf(output, "\\maketitle\n");
+    fprintf(output, "\%\tableofcontents\n\n"); */
     fprintf(output, "\\[");
     print_node_tex(expression, expression->tree->root, output, BEGIN_OP, MID);
     fprintf(output, "\\]");
@@ -297,6 +308,32 @@ int compare_operations_tex(int parent_op, int cur_op, int position) {
             return 0;
     }
 
+}
+
+
+void make_tex_file(MathExpression* expression, FILE* output) {
+
+    fprintf(output, "\\documentclass{article}\n");
+    fprintf(output, "\\usepackage[T2A]{fontenc}\n");
+    fprintf(output, "\\usepackage{hyphenat}\n");
+    fprintf(output, "\\usepackage[english, russian]{babel}\n\n");
+    fprintf(output, "\\title{<<В поисках производной>>}\n");
+    fprintf(output, "\\author{Кучина Марина, Б05-332}\n\n");
+    fprintf(output, "\\begin{document}\n");
+    fprintf(output, "\\maketitle\n");
+    fprintf(output, "%\\tableofcontents\n\n");
+
+    fprintf(output, "Продифференцируем выражение:\n");
+    print_tree_tex(expression, output);
+    fprintf(output, "\n");
+    MathExpression* new_expression = diff_expression(expression, output);
+
+    fprintf(output, "После дифференцирования получим: \n");
+    print_tree_tex(new_expression, output);
+    fprintf(output, "\n");
+    simplify_expression(new_expression, output);
+
+    fprintf(output, "\\end{document}");
 }
 
 

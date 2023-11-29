@@ -29,4 +29,6 @@ void print_node_tex(const MathExpression* expression, const Node* node, FILE* ou
 void print_oper_tex(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position);
 int compare_operations_tex(int parent_op, int cur_op, int position);
 
+void make_tex_file(MathExpression* expression, FILE* output);
+
 #endif // TREEDUMP_H_INCLUDED

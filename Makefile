@@ -17,7 +17,7 @@ Main.o: Main.cpp Tree.h TreeDump.h Diff.h ReadData.h
 Tree.o: Tree.cpp Tree.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
-TreeDump.o: TreeDump.cpp Tree.h TreeDump.h
+TreeDump.o: TreeDump.cpp Tree.h TreeDump.h ReadData.h Diff.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
 Diff.o: Diff.cpp Tree.h Diff.h ReadData.h
