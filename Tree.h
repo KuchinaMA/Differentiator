@@ -3,6 +3,7 @@
 
 const int DATA_POISON = -555;
 const int TYPE_POISON = 0;
+const int VAR_POISON = -777;
 const size_t MAX_LINE_LEN = 100;
 const int MAX_VARS_NUM = 50;
 const int DEFAULT_VAR_VALUE = 0;
@@ -62,6 +63,7 @@ MathExpression* read_data(FILE* file);
 Node* read_node(FILE* file, MathExpression* exp);
 void read_operation(FILE* file, MathExpression* exp, Node* node);
 void read_variable(FILE* file, MathExpression* exp, Node* node, char* current);
+bool find_variable_in_table(char* name, MathExpression* exp);
 
 int count_nodes(FILE* file);
 

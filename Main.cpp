@@ -12,20 +12,7 @@ int main() {
 
     MathExpression* exp = read_data(input);
 
-    /*fprintf(diff, "Продифференцируем выражение:\n");
-    print_tree_tex(exp, diff);
-    fprintf(diff, "\n");
-    MathExpression* new_exp = diff_expression(exp);
-
-    fprintf(diff, "После дифференцирования получим: \n");
-    print_tree_tex(new_exp, diff);
-    fprintf(diff, "\n");
-    simplify_expression(new_exp, diff);*/
-
     make_tex_file(exp, diff);
-
-    //graph_dump(new_exp);
-
 
     expression_dtor(exp);
     fclose(input);

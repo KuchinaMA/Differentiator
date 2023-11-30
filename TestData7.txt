@@ -1,0 +1,1 @@
+( pow ( div ( 1 nil nil ) ( x nil nil ) ) ( x nil nil ) )

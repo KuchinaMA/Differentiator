@@ -196,7 +196,7 @@ void print_tree_tex(const MathExpression* expression, FILE* output) {
 
     fprintf(output, "\\[");
     print_node_tex(expression, expression->tree->root, output, BEGIN_OP, MID);
-    fprintf(output, "\\]");
+    fprintf(output, "\\]\n");
 }
 
 
@@ -311,23 +311,51 @@ void make_tex_file(MathExpression* expression, FILE* output) {
     fprintf(output, "\\usepackage[T2A]{fontenc}\n");
     fprintf(output, "\\usepackage{hyphenat}\n");
     fprintf(output, "\\usepackage[english, russian]{babel}\n\n");
+    fprintf(output, "\\usepackage{ulem}");
     fprintf(output, "\\title{<<В поисках производной>>}\n");
     fprintf(output, "\\author{Кучина Марина, Б05-332}\n\n");
     fprintf(output, "\\begin{document}\n");
     fprintf(output, "\\maketitle\n");
-    fprintf(output, "%\\tableofcontents\n\n");
+    fprintf(output, "\\tableofcontents\n\n");
 
-    fprintf(output, "Продифференцируем выражение:\n");
+    fprintf(output, "\\chapter{Нахождение производной на примере некоторой функции}");
+    fprintf(output, "\\section{Введение}\n");
+    fprintf(output, "Производные функций, оказывается, придуманы не только для того, "
+    "чтобы удивлять студентов математических факультетов! Они также замечательно подходят для того, "
+    "чтобы вычислить скорость вашего друга, который завтракает за 5 минут до начала лекции, а также чтобы "
+    "предсказать, когда ваш утренний кофе остынет до состояния \"только для отважных\". Так что, поверьте, "
+    "производные действительно применимы в повседневной жизни, и на вопрос ваших друзей-гуманитариев \"А где "
+    "тебе это в жизни пригодится?\" можно найти тысячу и один ответ и даже больше.\n\n");
+    fprintf(output, "Возможно, вы всё ещё думаете, что брать производные - слишком сложная задача? "
+    "Но выдающиеся люди говорили: \"дифференцировать можно и обезьяну научить\" "
+    "(\\sout{именно поэтому автор попытался научить компьютер})\n\n");
+    fprintf(output, "Давайте же покажем, что вы лучше обезьян и найдём производную этой тривиальной функции!\n\n");
     print_tree_tex(expression, output);
-    fprintf(output, "\n");
+
+    fprintf(output, "\\section{Вычисление, собственно, производной}\n");
+    fprintf(output, "Итак, продифференцируем выражение:\n");
+    print_tree_tex(expression, output);
+
     MathExpression* new_expression = diff_expression(expression, output);
 
-    fprintf(output, "После дифференцирования получим: \n");
+    fprintf(output, "\\section{Упрощение полученного выражения}\n");
+    fprintf(output, "Теперь упростим полученное после дифференцирования выражение: \n");
     print_tree_tex(new_expression, output);
     fprintf(output, "\n");
     simplify_expression(new_expression, output);
+    fprintf(output, "Поздравляем! мы нашли производную!\n");
 
-    fprintf(output, "\\end{document}");
+    fprintf(output, "\\section{Список использованной литературы}\n");
+    fprintf(output, "\\begin{enumerate}\n");
+    fprintf(output, "\\item[1] Керниган Б., Ритчи Д. Язык Программирования Си (3-е издание)");
+    fprintf(output, "\\item[2] Виленкин Н.Я., Ивашев-Мусатов О.С., Шварцбурд С.И. "
+                    "Алгебра и начала математического анализа. 10 класс. Углубленный уровень (18-е издание 2014 г.)\n");
+    fprintf(output, "\\item[3] Ещё не умершая фантазия автора\n");
+    fprintf(output, "\\item[4] \\sout{Гитхабы одногруппников}\n");
+    fprintf(output, "\\item[5] Бесценное наследие, оставленное предыдущими поколениями в виде их статей\n");
+    fprintf(output, "\\end{enumerate}\n");
+
+    fprintf(output, "\n\n\\end{document}");
 }
 
 

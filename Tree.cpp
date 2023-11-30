@@ -255,13 +255,25 @@ void read_variable(FILE* file, MathExpression* exp, Node* node, char* current) {
     assert(exp);
     assert(node);
 
-    exp->variables_table[exp->vars_num].name = strdup(current);
-    exp->variables_table[exp->vars_num].value = DEFAULT_VAR_VALUE;
-
     node->data = exp->vars_num;
     node->type = T_VAR;
 
-    exp->vars_num ++;
+    if (!find_variable_in_table(current, exp)) {
+        exp->variables_table[exp->vars_num].name = strdup(current);
+        exp->variables_table[exp->vars_num].value = DEFAULT_VAR_VALUE;
+        exp->vars_num ++;
+    }
+}
+
+bool find_variable_in_table(char* name, MathExpression* exp) {
+
+    assert(exp);
+
+    for (int i = 0; i < MAX_VARS_NUM; i++) {
+        if (exp->variables_table[i].name == name)
+            return true;
+    }
+    return false;
 }
 
 
