@@ -24,6 +24,13 @@
 #define SIN_NODE(arg)         node_ctor(T_OP, SIN, NULL, arg)
 #define COS_NODE(arg)         node_ctor(T_OP, COS, NULL, arg)
 
+#define LEFT     node->left
+#define RIGHT    node->right
+#define L_DATA   node->left->data
+#define R_DATA   node->right->data
+#define L_TYPE   node->left->type
+#define R_TYPE   node->right->type
+
 
 Node* derivative(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
@@ -97,7 +104,7 @@ Node* copy_node(const Node* node) {
 
     assert(node);
 
-    Node* new_node = node_ctor(node->type, node->data, node->left, node->right);
+    Node* new_node = node_ctor(node->type, node->data, LEFT, RIGHT);
 
     return new_node;
 }
@@ -140,16 +147,16 @@ Node* diff_pow(MathExpression* expression, const Node* node, FILE* output, Lines
 
     assert(node);
 
-    bool basis_var = find_var(node->left);
-    bool indicator_var = find_var(node->right);
+    bool basis_var = find_var(LEFT);
+    bool indicator_var = find_var(RIGHT);
 
     if (!basis_var && !indicator_var)
         return NUM_NODE(0);
 
     else if(basis_var && !indicator_var) {
 
-        Node* multiplier = NUM_NODE(node->right->data);
-        Node* new_indicator = NUM_NODE(node->right->data - 1);
+        Node* multiplier = NUM_NODE(R_DATA);
+        Node* new_indicator = NUM_NODE(R_DATA - 1);
         Node* new_degree = POW_NODE(cL, new_indicator);
 
         Node* res = MUL_NODE(multiplier, new_degree);
@@ -247,13 +254,13 @@ bool find_var(Node *node) {
     if (node->type == T_VAR)
         return true;
 
-    if (node->left != NULL) {
-        if (find_var(node->left))
+    if (LEFT != NULL) {
+        if (find_var(LEFT))
             return true;
     }
 
-    if (node->right != NULL) {
-        if (find_var(node->right))
+    if (RIGHT != NULL) {
+        if (find_var(RIGHT))
             return true;
     }
 
@@ -264,15 +271,15 @@ void remove_const_values(MathExpression* expression, Node* node, bool* changes, 
 
     assert(node);
 
-    if (node->left != NULL)
-        remove_const_values(expression, node->left, changes, output, text);
+    if (LEFT != NULL)
+        remove_const_values(expression, LEFT, changes, output, text);
 
-    if (node->right != NULL)
-        remove_const_values(expression, node->right, changes, output, text);
+    if (RIGHT != NULL)
+        remove_const_values(expression, RIGHT, changes, output, text);
 
-    if (node->type == T_OP && node->left != NULL && node->right != NULL) {
+    if (node->type == T_OP && LEFT != NULL && RIGHT != NULL) {
 
-        if (!find_var(node->left) && !find_var(node->right)) {
+        if (!find_var(LEFT) && !find_var(RIGHT)) {
 
             *changes = true;
 
@@ -280,11 +287,11 @@ void remove_const_values(MathExpression* expression, Node* node, bool* changes, 
             node->type = T_NUM;
             node->data = subtree_value;
 
-            node_dtor(node->left);
-            node_dtor(node->right);
+            node_dtor(LEFT);
+            node_dtor(RIGHT);
 
-            node->left = NULL;
-            node->right = NULL;
+            LEFT = NULL;
+            RIGHT = NULL;
 
             print_phrase(expression, output, text);
 
@@ -298,31 +305,31 @@ void remove_neutral_elements(MathExpression* expression, Node* node, bool* chang
 
     assert(node);
 
-    if (node->left != NULL)
-        remove_neutral_elements(expression, node->left, changes, output, text);
+    if (LEFT != NULL)
+        remove_neutral_elements(expression, LEFT, changes, output, text);
 
-    if (node->right != NULL)
-        remove_neutral_elements(expression, node->right, changes, output, text);
+    if (RIGHT != NULL)
+        remove_neutral_elements(expression, RIGHT, changes, output, text);
 
     if (node->type == T_OP && node->data == ADD) {
 
-        if (node->left->type == T_NUM && node->left->data == 0) {
+        if (L_TYPE == T_NUM && L_DATA == 0) {
 
             *changes = true;
 
-            node_dtor(node->left);
-            *node = *node->right;
+            node_dtor(LEFT);
+            *node = *RIGHT;
 
             print_phrase(expression, output, text);
 
         }
 
-        else if (node->right->type == T_NUM && node->right->data == 0) {
+        else if (R_TYPE == T_NUM && R_DATA == 0) {
 
             *changes = true;
 
-            node_dtor(node->right);
-            *node = *node->left;
+            node_dtor(RIGHT);
+            *node = *LEFT;
 
             print_phrase(expression, output, text);
         }
@@ -330,39 +337,39 @@ void remove_neutral_elements(MathExpression* expression, Node* node, bool* chang
 
     else if (node->type == T_OP && node->data == MUL) {
 
-        if ((node->left->type == T_NUM && node->left->data == 0) ||
-            (node->right->type == T_NUM &&  node->right->data == 0)) {
+        if ((L_TYPE == T_NUM && L_DATA == 0) ||
+            (R_TYPE == T_NUM &&  R_DATA == 0)) {
 
             *changes = true;
 
             node->type = T_NUM;
             node->data = 0;
 
-            node_dtor(node->left);
-            node_dtor(node->right);
+            node_dtor(LEFT);
+            node_dtor(RIGHT);
 
-            node->left = NULL;
-            node->right = NULL;
-
-            print_phrase(expression, output, text);
-        }
-
-        else if (node->left->type == T_NUM && node->left->data == 1) {
-
-            *changes = true;
-
-            node_dtor(node->left);
-            *node = *node->right;
+            LEFT = NULL;
+            RIGHT = NULL;
 
             print_phrase(expression, output, text);
         }
 
-        else if (node->right->type == T_NUM && node->right->data == 1) {
+        else if (L_TYPE == T_NUM && L_DATA == 1) {
 
             *changes = true;
 
-            node_dtor(node->right);
-            *node = *node->left;
+            node_dtor(LEFT);
+            *node = *RIGHT;
+
+            print_phrase(expression, output, text);
+        }
+
+        else if (R_TYPE == T_NUM && R_DATA == 1) {
+
+            *changes = true;
+
+            node_dtor(RIGHT);
+            *node = *LEFT;
 
             print_phrase(expression, output, text);
         }
@@ -370,28 +377,28 @@ void remove_neutral_elements(MathExpression* expression, Node* node, bool* chang
 
     else if (node->type == T_OP && node->data == POW) {
 
-        if (node->right->type == T_NUM && node->right->data == 0) {
+        if (R_TYPE == T_NUM && R_DATA == 0) {
 
             *changes = true;
 
             node->type = T_NUM;
             node->data = 1;
 
-            node_dtor(node->left);
-            node_dtor(node->right);
+            node_dtor(LEFT);
+            node_dtor(RIGHT);
 
-            node->left = NULL;
-            node->right = NULL;
+            LEFT = NULL;
+            RIGHT = NULL;
 
             print_phrase(expression, output, text);
         }
 
-        else if (node->right->type == T_NUM && node->right->data == 1) {
+        else if (R_TYPE == T_NUM && R_DATA == 1) {
 
             *changes = true;
 
-            node_dtor(node->right);
-            *node = *node->left;
+            node_dtor(RIGHT);
+            *node = *LEFT;
 
             print_phrase(expression, output, text);
         }
@@ -439,9 +446,9 @@ void print_phrase_diff(MathExpression* expression, const Node* node, const Node*
     int phrase_number = rand() % NUMBER_OF_STRINGS;
     fprintf(output, "%s", text[phrase_number].pointer);
     fprintf(output, "\\[(");
-    print_node_tex(expression, node, output, BEGIN_OP, MID);
+    print_node_tex(expression, node, output, BEGIN_OP, MID_POS);
     fprintf(output, ")' = ");
-    print_node_tex(expression, res, output, BEGIN_OP, MID);
+    print_node_tex(expression, res, output, BEGIN_OP, MID_POS);
     fprintf(output, "\\]");
     fprintf(output, "\n");
 }

@@ -3,9 +3,9 @@
 
 const int BEGIN_OP = 20;
 enum Positions{
-    LEFT  = -1,
-    MID   =  0,
-    RIGHT =  1,
+    LEFT_POS  = -1,
+    MID_POS   =  0,
+    RIGHT_POS =  1,
 };
 
 void print_node_pre(const Node* node, FILE* output);

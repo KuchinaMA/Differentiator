@@ -33,7 +33,7 @@ void print_data(const Node* node, FILE* output) {
 }
 
 void print_tree_in(const MathExpression* expression, FILE* output) {
-    print_node_in(expression, expression->tree->root, output, BEGIN_OP, MID);
+    print_node_in(expression, expression->tree->root, output, BEGIN_OP, MID_POS);
 }
 
 void print_node_in(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position) {
@@ -52,9 +52,9 @@ void print_node_in(const MathExpression* expression, const Node* node, FILE* out
 
 void print_num(const MathExpression* expression, const Node* node, FILE* output) {
 
-    print_node_in(expression, node->left, output, node->data, LEFT);
+    print_node_in(expression, node->left, output, node->data, LEFT_POS);
     fprintf(output, " %d", node->data);
-    print_node_in(expression, node->right, output, node->data, RIGHT);
+    print_node_in(expression, node->right, output, node->data, RIGHT_POS);
 }
 
 void print_oper(const MathExpression* expression, const Node* node, FILE* output, int parent_data, int position) {
@@ -62,18 +62,18 @@ void print_oper(const MathExpression* expression, const Node* node, FILE* output
     int bracket = compare_operations(parent_data, node->data, position);
     if (bracket)
         fprintf(output, " (");
-    print_node_in(expression, node->left, output, node->data, LEFT);
+    print_node_in(expression, node->left, output, node->data, LEFT_POS);
     fprintf(output, " %s", operation_to_sign(node));
-    print_node_in(expression, node->right, output, node->data, RIGHT);
+    print_node_in(expression, node->right, output, node->data, RIGHT_POS);
     if (bracket)
         fprintf(output, " )");
 }
 
 void print_var(const MathExpression* expression, const Node* node, FILE* output) {
 
-    print_node_in(expression, node->left, output, node->data, LEFT);
+    print_node_in(expression, node->left, output, node->data, LEFT_POS);
     fprintf(output, " %s", expression->variables_table[node->data].name);
-    print_node_in(expression, node->right, output, node->data, RIGHT);
+    print_node_in(expression, node->right, output, node->data, RIGHT_POS);
 }
 
 
@@ -111,7 +111,7 @@ int compare_operations(int parent_op, int cur_op, int position) {
 
     else if (parent_op == SUB) {
         if (cur_op == ADD || cur_op == SUB) {
-            if (position == RIGHT)
+            if (position == RIGHT_POS)
                 return 1;
         }
         else
@@ -128,7 +128,7 @@ int compare_operations(int parent_op, int cur_op, int position) {
 
     else if (parent_op == DIV) {
         if (cur_op == MUL || cur_op == DIV) {
-            if (position == LEFT)
+            if (position == LEFT_POS)
                 return 0;
         }
         else
@@ -195,7 +195,7 @@ void edge_graph_dump(const Node* node, FILE* dotfile) {
 void print_tree_tex(const MathExpression* expression, FILE* output) {
 
     fprintf(output, "\\[");
-    print_node_tex(expression, expression->tree->root, output, BEGIN_OP, MID);
+    print_node_tex(expression, expression->tree->root, output, BEGIN_OP, MID_POS);
     fprintf(output, "\\]\n");
 }
 
@@ -217,17 +217,17 @@ void print_oper_tex(const MathExpression* expression, const Node* node, FILE* ou
 
     if (node->data == DIV) {
         fprintf(output, " \\frac{");
-        print_node_tex(expression, node->left, output, node->data, LEFT);
+        print_node_tex(expression, node->left, output, node->data, LEFT_POS);
         fprintf(output, "}{");
-        print_node_tex(expression, node->right, output, node->data, RIGHT);
+        print_node_tex(expression, node->right, output, node->data, RIGHT_POS);
         fprintf(output, "}");
     }
 
     else if (node->data == POW) {
 
-        print_node_tex(expression, node->left, output, node->data, LEFT);
+        print_node_tex(expression, node->left, output, node->data, LEFT_POS);
         fprintf(output, " %s {", operation_to_sign(node));
-        print_node_tex(expression, node->right, output, node->data, RIGHT);
+        print_node_tex(expression, node->right, output, node->data, RIGHT_POS);
         fprintf(output, "}");
     }
 
@@ -236,14 +236,14 @@ void print_oper_tex(const MathExpression* expression, const Node* node, FILE* ou
         if (bracket)
             fprintf(output, " (");
 
-        print_node_tex(expression, node->left, output, node->data, LEFT);
+        print_node_tex(expression, node->left, output, node->data, LEFT_POS);
 
         if (node->data == MUL)
             fprintf(output, " \\cdot");
         else
             fprintf(output, " %s", operation_to_sign(node));
 
-        print_node_tex(expression, node->right, output, node->data, RIGHT);
+        print_node_tex(expression, node->right, output, node->data, RIGHT_POS);
 
         if (bracket)
             fprintf(output, " )");
@@ -260,7 +260,7 @@ int compare_operations_tex(int parent_op, int cur_op, int position) {
         case SUB:
 
             if (cur_op == ADD || cur_op == SUB) {
-            if (position == RIGHT)
+            if (position == RIGHT_POS)
                 return 1;
             }
             else
@@ -278,7 +278,7 @@ int compare_operations_tex(int parent_op, int cur_op, int position) {
             return 0;
 
         case POW:
-            if (position == LEFT)
+            if (position == LEFT_POS)
                 return 1;
             else
                 return 0;
