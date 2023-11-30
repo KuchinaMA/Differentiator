@@ -14,15 +14,15 @@
 #define cL copy_node(node->left)
 #define cR copy_node(node->right)
 
-#define num_node(arg)         node_ctor(T_NUM, arg, NULL, NULL)
-#define add_node(left, right) node_ctor(T_OP, ADD, left, right)
-#define sub_node(left, right) node_ctor(T_OP, SUB, left, right)
-#define mul_node(left, right) node_ctor(T_OP, MUL, left, right)
-#define div_node(left, right) node_ctor(T_OP, DIV, left, right)
-#define pow_node(left, right) node_ctor(T_OP, POW, left, right)
-#define ln_node(arg)          node_ctor(T_OP, LN, NULL, arg)
-#define sin_node(arg)         node_ctor(T_OP, SIN, NULL, arg)
-#define cos_node(arg)         node_ctor(T_OP, COS, NULL, arg)
+#define NUM_NODE(arg)         node_ctor(T_NUM, arg, NULL, NULL)
+#define ADD_NODE(left, right) node_ctor(T_OP, ADD, left, right)
+#define SUB_NODE(left, right) node_ctor(T_OP, SUB, left, right)
+#define MUL_NODE(left, right) node_ctor(T_OP, MUL, left, right)
+#define DIV_NODE(left, right) node_ctor(T_OP, DIV, left, right)
+#define POW_NODE(left, right) node_ctor(T_OP, POW, left, right)
+#define LN_NODE(arg)          node_ctor(T_OP, LN, NULL, arg)
+#define SIN_NODE(arg)         node_ctor(T_OP, SIN, NULL, arg)
+#define COS_NODE(arg)         node_ctor(T_OP, COS, NULL, arg)
 
 
 Node* derivative(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
@@ -32,13 +32,13 @@ Node* derivative(MathExpression* expression, const Node* node, FILE* output, Lin
     switch (node->type) {
 
         case T_NUM: {
-            Node* res = num_node(0);
+            Node* res = NUM_NODE(0);
             print_phrase_diff(expression, node, res, output, text);
             return res;
         }
 
         case T_VAR: {
-            Node* res = num_node(1);
+            Node* res = NUM_NODE(1);
             print_phrase_diff(expression, node, res, output, text);
             return res;
         }
@@ -61,10 +61,10 @@ Node* diff_operation(MathExpression* expression, const Node* node, FILE* output,
     switch(node->data) {
 
         case ADD:
-            return add_node(dL, dR);
+            return ADD_NODE(dL, dR);
 
         case SUB:
-            return sub_node(dL, dR);
+            return SUB_NODE(dL, dR);
 
         case MUL:
             return diff_mul(expression, node, output, text);
@@ -107,33 +107,33 @@ Node* diff_mul(MathExpression* expression, const Node* node, FILE* output, Lines
 
     assert(node);
 
-    Node* new_left = mul_node(dL, cR);
-    Node* new_right = mul_node(cL, dR);
+    Node* new_left = MUL_NODE(dL, cR);
+    Node* new_right = MUL_NODE(cL, dR);
 
-    return add_node(new_left, new_right);
+    return ADD_NODE(new_left, new_right);
 }
 
 Node* diff_div(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
-    Node* numerator_left = mul_node(dL, cR);
-    Node* numerator_right = mul_node(cL, dR);
+    Node* numerator_left = MUL_NODE(dL, cR);
+    Node* numerator_right = MUL_NODE(cL, dR);
 
-    Node* numerator = sub_node(numerator_left, numerator_right);
-    Node* denominator = mul_node(cR, cR);
+    Node* numerator = SUB_NODE(numerator_left, numerator_right);
+    Node* denominator = MUL_NODE(cR, cR);
 
-    return div_node(numerator, denominator);
+    return DIV_NODE(numerator, denominator);
 }
 
 Node* diff_ln(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
-    Node* numerator = num_node(1);
-    Node* res = div_node(numerator, cR);
+    Node* numerator = NUM_NODE(1);
+    Node* res = DIV_NODE(numerator, cR);
 
-    return mul_node(res, dR);
+    return MUL_NODE(res, dR);
 }
 
 Node* diff_pow(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
@@ -144,26 +144,26 @@ Node* diff_pow(MathExpression* expression, const Node* node, FILE* output, Lines
     bool indicator_var = find_var(node->right);
 
     if (!basis_var && !indicator_var)
-        return node_ctor(T_NUM, 0, NULL, NULL);
+        return NUM_NODE(0);
 
     else if(basis_var && !indicator_var) {
 
-        Node* multiplier = num_node(node->right->data);
-        Node* new_indicator = num_node(node->right->data - 1);
-        Node* new_degree = pow_node(cL, new_indicator);
+        Node* multiplier = NUM_NODE(node->right->data);
+        Node* new_indicator = NUM_NODE(node->right->data - 1);
+        Node* new_degree = POW_NODE(cL, new_indicator);
 
-        Node* res = mul_node(multiplier, new_degree);
+        Node* res = MUL_NODE(multiplier, new_degree);
 
-        return mul_node(res, dL);
+        return MUL_NODE(res, dL);
     }
 
     else if(!basis_var && indicator_var) {
 
-        Node* multiplier = ln_node(cL);
+        Node* multiplier = LN_NODE(cL);
         Node* new_node = copy_node(node);
-        Node* res = mul_node(multiplier, new_node);
+        Node* res = MUL_NODE(multiplier, new_node);
 
-        return mul_node(res, dR);
+        return MUL_NODE(res, dR);
     }
 
     else
@@ -176,50 +176,50 @@ Node* diff_sin(MathExpression* expression, const Node* node, FILE* output, Lines
 
     assert(node);
 
-    Node* res = cos_node(cR);
+    Node* res = COS_NODE(cR);
 
-    return mul_node(res, dR);
+    return MUL_NODE(res, dR);
 }
 
 Node* diff_cos(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
-    Node* new_node = sin_node(cR);
-    Node* minus_mul = num_node(-1);
-    Node* res = mul_node(minus_mul, new_node);
+    Node* new_node = SIN_NODE(cR);
+    Node* minus_mul = NUM_NODE(-1);
+    Node* res = MUL_NODE(minus_mul, new_node);
 
-    return mul_node(res, dR);
+    return MUL_NODE(res, dR);
 }
 
 Node* diff_tan(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
-    Node* numerator = num_node(1);
+    Node* numerator = NUM_NODE(1);
 
-    Node* cos_node1 = cos_node(cR);
-    Node* cos_node2 = cos_node(cR);
-    Node* denominator = mul_node(cos_node1, cos_node2);
+    Node* cos_node1 = COS_NODE(cR);
+    Node* cos_node2 = COS_NODE(cR);
+    Node* denominator = MUL_NODE(cos_node1, cos_node2);
 
-    Node* res = div_node(numerator, denominator);
+    Node* res = DIV_NODE(numerator, denominator);
 
-    return mul_node(res, dR);
+    return MUL_NODE(res, dR);
 }
 
 Node* diff_ctg(MathExpression* expression, const Node* node, FILE* output, LinesData* text) {
 
     assert(node);
 
-    Node* numerator = num_node(-1);
+    Node* numerator = NUM_NODE(-1);
 
-    Node* sin_node1 = sin_node(cR);
-    Node* sin_node2 = sin_node(cR);
-    Node* denominator = mul_node(sin_node1, sin_node2);
+    Node* sin_node1 = SIN_NODE(cR);
+    Node* sin_node2 = SIN_NODE(cR);
+    Node* denominator = MUL_NODE(sin_node1, sin_node2);
 
-    Node* res = div_node(numerator, denominator);
+    Node* res = DIV_NODE(numerator, denominator);
 
-    return mul_node(res, dR);
+    return MUL_NODE(res, dR);
 }
 
 
