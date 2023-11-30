@@ -1,1 +1,1 @@
-( pow ( div ( 1 nil nil ) ( x nil nil ) ) ( x nil nil ) )
+( add ( pow ( cos nil ( add ( mul ( 10 nil nil ) ( x nil nil ) ) ( 3 nil nil ) ) ) ( 4 nil nil ) ) ( sin nil ( add ( pow ( x nil nil ) ( 5 nil nil ) ) ( 6 nil nil ) ) ) )
