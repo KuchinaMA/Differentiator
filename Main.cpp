@@ -7,8 +7,8 @@
 
 int main() {
 
-    FILE* input = fopen("TestData7.txt", "r");
-    FILE* diff = fopen("TreeDumpDiff7.tex", "w");
+    FILE* input = fopen("TestData4.txt", "r");
+    FILE* diff = fopen("TreeDumpDiff4.tex", "w");
 
     MathExpression* exp = read_data(input);
 
