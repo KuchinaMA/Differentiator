@@ -8,13 +8,16 @@ CFLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equ
 
 all: DiffRes.exe
 
-DiffRes.exe: Main.o Tree.o TreeDump.o Diff.o ReadData.o
+DiffRes.exe: Main.o Tree.o Descent.o TreeDump.o Diff.o ReadData.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 Main.o: Main.cpp Tree.h TreeDump.h Diff.h ReadData.h   
 	$(CC) $(CFLAGS) $< -c -o $@
 
 Tree.o: Tree.cpp Tree.h
+	$(CC) $(CFLAGS) $< -c -o $@
+
+Descent.o: Descent.cpp Tree.h Descent.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
 TreeDump.o: TreeDump.cpp Tree.h TreeDump.h ReadData.h Diff.h
