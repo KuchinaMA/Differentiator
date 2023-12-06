@@ -20,13 +20,17 @@ enum Operations {
     MUL = 23,
     DIV = 24,
 
-    LN  = 25,
-    POW = 26,
+    POW = 25,
+    LN  = 26,
 
     SIN = 27,
     COS = 28,
     TAN = 29,
     CTG = 30,
+
+    OPEN_BR  = 40,
+    CLOSE_BR = 41,
+    LINE_END = 42,
 };
 
 struct Node {

@@ -296,14 +296,13 @@ MathExpression* read_data(FILE* file) {
 }
 
 
-
 void copy_variables(MathExpression* new_exp, const MathExpression* old_exp) {
 
     assert(new_exp);
     assert(old_exp);
 
-    for (size_t i = 0; i < old_exp->vars_num; i++)
-    {
+    for (size_t i = 0; i < old_exp->vars_num; i++) {
+
         new_exp->variables_table[i].name  = strdup(old_exp->variables_table[i].name);
         new_exp->variables_table[i].value = old_exp->variables_table[i].value;
     }
